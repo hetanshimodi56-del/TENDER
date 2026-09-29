@@ -43,7 +43,16 @@ app.use(express.urlencoded({ extended: true, limit: '20mb' }));
 // Static uploads directory
 app.use('/uploads', express.static(path.join(__dirname, '..', 'uploads')));
 
-// Health Check
+// Root Route & Health Check
+app.get('/', (req, res) => {
+  res.json({
+    status: 'online',
+    service: 'AI E-Tender Platform API Backend',
+    message: 'Backend server is running successfully.',
+    health_check: '/api/health'
+  });
+});
+
 app.get('/api/health', (req, res) => {
   res.json({
     status: 'online',
