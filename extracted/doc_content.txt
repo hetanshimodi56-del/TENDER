@@ -1,0 +1,635 @@
+1. Project Overview
+
+This enhanced specification defines a secure, professional and intelligent personalized tender discovery platform . The platform combines tender search, preference-based matching, alerts, AI-assisted analysis, eligibility checking, document intelligence, comparison, analytics and controlled official tender publishing.
+
+The design follows the supplied project specification and expands it into a presentation-ready system document with architecture, workflows, role boundaries, database design, API structure, security controls and implementation guidance. The core access rule remains: normal users can discover and analyze tenders, while official tender publication is restricted to authorized Tender Authorities under Super Admin control.
+
+Academic Level: B.Sc. IT (Hons), Semester 7
+
+System Type: Full-Stack + AI + Analytics
+
+Primary users: Company/User, Tender Authority, Super Admin and Evaluator
+
+Core outcome: personalized, explainable tender intelligence and decision support
+
+2. Project Objectives
+
+Provide secure registration, login, role-based access and profile management.
+
+Allow users to search, filter, sort, view, compare, save and favourite tenders.
+
+Capture company preferences such as category, industry, location, value range, keywords and deadline window.
+
+Generate explainable AI matching results using verified company/profile and tender requirements.
+
+Check eligibility and clearly show matched, missing and unverified criteria.
+
+Analyze authorized tender documents and generate structured summaries and bidder checklists.
+
+Provide grounded natural-language Q&A through Ask Your Tender AI.
+
+Deliver personalized new-match and deadline alerts.
+
+Support controlled tender publishing by authorized Tender Authorities.
+
+Provide analytics, data-quality controls, auditability and exportable reports.
+
+3. High-Level System Architecture
+
+Figure 1. Proposed multi-layer architecture for the AI E-Tender platform.
+
+4. User Roles & Access Control
+
+Role
+
+Main Functions
+
+Restrictions
+
+Super Admin / Platform Owner
+
+Users, organizations, roles, authority permissions, imports, analytics, settings, audit logs
+
+Controls platform; normal users cannot obtain admin rights
+
+Authorized Tender Authority
+
+Create, edit, validate, publish, close organization tenders; upload documents; tender analytics
+
+Only after Super Admin authorization; limited to authorized organization scope
+
+Company / User
+
+Register/login, profile, search, filter, view, compare, save, favourite, preferences, recommendations, alerts, AI analysis, eligibility
+
+Cannot create or publish official tenders
+
+Evaluator
+
+Assigned bid review, scoring, comments, comparison and recommendation
+
+Only assigned tenders/bids
+
+5. Authentication & User Management
+
+Professional first screen with Login, Register and Forgot Password.
+
+Secure password hashing; never store plain-text passwords.
+
+JWT/session authentication with role-based authorization.
+
+User profile, company profile, account status and organization association.
+
+Optional email/OTP verification and password reset.
+
+Login activity and sensitive actions recorded in audit logs.
+
+Protected UI routes and protected server-side APIs.
+
+6. Admin Module
+
+Dashboard: total tenders, active/closed tenders, users, organizations, saved tenders, alerts and system activity.
+
+CSV/Excel import with column mapping, validation, duplicate detection and import history.
+
+Tender data search, filter, refresh and export.
+
+User activation/deactivation, role assignment, profile review and organization mapping.
+
+Tender Authority approval and permission matrix.
+
+Audit log and system/data-quality monitoring.
+
+7. Tender Authority Module
+
+Authority dashboard for draft, pending approval, published, closing-soon and closed tenders.
+
+Create Tender wizard with validation before publication.
+
+Upload tender notice, eligibility documents, BOQ/specifications and supporting files.
+
+Lifecycle: Draft → Validate → Submit/Approve → Publish → Update/Extend/Cancel → Close → Archive.
+
+Store Created By, Organization, Authority ID, Created Date, Published By and status history.
+
+Optional Super Admin approval before first publication or sensitive changes.
+
+8. Company/User Module
+
+Dashboard with recommended tenders, saved tenders, favourites, upcoming deadlines, new matches and recent searches.
+
+Search → Filter → View Details → Save/Favourite/Compare/Set Alert.
+
+My Tenders for saved/bookmarked/recently viewed tenders and application status where enabled.
+
+My Favourites with notes and deadline status.
+
+My Preferences for category, industry, location, tender value, keywords, deadline window, experience and certification.
+
+9. Smart Tender Discovery
+
+Area
+
+Capabilities
+
+Search
+
+Tender ID, title, keyword, department, organization, category, location, eligibility keyword
+
+Filters
+
+Estimated value, EMD, tender fee, issue date, closing date, experience, turnover, certification
+
+Sorting
+
+Relevance, newest, deadline, estimated value, AI match score
+
+Productivity
+
+Pagination, clear filters, recent searches, saved searches
+
+Discovery
+
+Similar Tender suggestions on every detail page
+
+10. Professional Tender Details Page
+
+Summary card: Tender ID, organization, category, location, value, deadline and status.
+
+Eligibility, technical requirements, important dates and required documents.
+
+Document preview/download area.
+
+Actions: Save, Favourite, Compare, Set Alert, Check Eligibility, Analyze with AI and Get Recommendation.
+
+Deadline countdown and status badge.
+
+Transparent 'Why this tender?' section showing matching reasons.
+
+11. AI Recommendation & Matching Engine
+
+Compare verified company/profile information with verified tender requirements.
+
+Produce an explainable match score such as 91% based on defined criteria.
+
+Consider industry/category, location, experience, skills/services, certifications, turnover/budget and available requirements.
+
+Show matched criteria, missing criteria, risks/gaps and recommendation reasons.
+
+Show similar tenders and alternative opportunities.
+
+Keep recommendation history so users can understand why a tender was recommended at that time.
+
+AI must not invent tender facts; numerical values should come from verified database/analytics data.
+
+12. Eligibility Checker
+
+One-click Check My Eligibility.
+
+Compare company profile against mandatory tender requirements.
+
+Return Eligible, Partially Eligible or Not Eligible.
+
+Show exact missing/unverified criteria and required documents.
+
+Allow profile update and re-check.
+
+Treat the result as decision support, not a legal/procurement guarantee.
+
+13. Tender Document Analyzer
+
+Read authorized tender PDFs and supporting documents.
+
+Extract dates, eligibility, experience, turnover, certifications, documents, EMD/fee and submission instructions.
+
+Generate structured Tender Summary.
+
+Highlight important clauses and action items.
+
+Generate bidder checklist.
+
+Use source-linked/grounded content where possible and distinguish extracted facts from AI interpretation.
+
+14. Ask Your Tender AI
+
+Natural-language Q&A over the selected tender and authorized documents.
+
+Questions can include closing date, required documents, experience, estimated value and other tender-specific facts.
+
+Answers must be grounded in the selected tender/document context.
+
+Important answers should show source/document references.
+
+If information is unavailable, the assistant must say it is unavailable instead of guessing.
+
+15. Tender Comparison
+
+Select 2–5 tenders for side-by-side comparison.
+
+Compare organization, category, location, value, deadline, EMD, eligibility, experience, certifications and match score.
+
+Show deadline urgency and missing requirements.
+
+Export comparison as PDF/Excel.
+
+The user makes the final choice; the system provides factual comparison and decision support.
+
+16. Personalized Alerts & Smart Calendar
+
+Automatically match new imported/published tenders against saved preferences.
+
+In-app notification center with unread count and mark-as-read.
+
+Deadline alerts at 7 days, 3 days, 1 day and configurable custom reminders.
+
+Optional email notifications and alert history.
+
+Calendar view for saved/matched deadlines with upcoming, urgent, closed and completed statuses.
+
+Daily/weekly agenda view and one-click navigation to tender details.
+
+17. Analytics & Intelligence
+
+Dashboard Area
+
+Example KPIs / Insights
+
+Tender Analytics
+
+Total, active, closed, average value
+
+Distribution
+
+Category and location distribution
+
+User Analytics
+
+Saved, favourite and matched tender activity
+
+Trends
+
+Monthly/category/department trends where data is sufficient
+
+Deadline Activity
+
+Upcoming and urgent deadline activity
+
+AI Intelligence
+
+Top matching categories, similarity and opportunity-fit analysis
+
+Data Quality
+
+Duplicates, missing fields, expired tenders and import errors
+
+18. Tender Intelligence & Data Quality
+
+Duplicate detection using tender ID and similarity checks.
+
+Missing-field detection before import/publication.
+
+Expired-tender detection and status update.
+
+Validation for dates, numeric values and required fields.
+
+Row-level import error reports.
+
+Data-quality dashboard.
+
+19. Database Design
+
+Core tables: Users, Roles, Permissions, Organizations, CompanyProfiles, TenderAuthorities, Tenders, TenderDocuments.
+
+Personalization: UserPreferences, SavedTenders, FavouriteTenders, TenderAlerts, Notifications.
+
+AI/decision support: Recommendations, EligibilityChecks, AIConversations, AIMessageSources.
+
+Operations: Analytics/KPIs, ImportJobs, ImportErrors, AuditLogs.
+
+Optional bidding phase: Bids, BidDocuments, Evaluations, EvaluationScores and Awards.
+
+20. Suggested API Structure
+
+Endpoint
+
+Purpose
+
+/api/auth
+
+Register, login, logout, refresh, forgot/reset password
+
+/api/users
+
+Profile, users, roles and permissions
+
+/api/tenders
+
+Authorized tender CRUD; user search/filter/details
+
+/api/import
+
+CSV/Excel import, validation and import history
+
+/api/preferences
+
+Save/update user preferences
+
+/api/saved
+
+Saved/favourite tenders
+
+/api/alerts
+
+Create/update/read notifications
+
+/api/recommendations
+
+Match score and recommendation reasons
+
+/api/eligibility
+
+Eligibility checks
+
+/api/ai
+
+Document analysis, summary and Ask Your Tender
+
+/api/compare
+
+Compare selected tenders
+
+/api/analytics
+
+Dashboard KPI data
+
+/api/audit
+
+Authorized audit log access
+
+21. Technology Stack
+
+Layer
+
+Recommended Technology
+
+Frontend
+
+React.js + Tailwind CSS or Bootstrap
+
+Backend
+
+Node.js + Express.js REST API
+
+Database
+
+PostgreSQL recommended; MySQL/MongoDB possible depending on implementation
+
+AI & Analytics
+
+Python, Pandas, NumPy, scikit-learn; AI API such as OpenAI/Gemini where permitted
+
+Charts
+
+Recharts or Chart.js
+
+Authentication
+
+JWT + secure password hashing + RBAC
+
+Files
+
+Multer + PDF/Excel/CSV processing libraries
+
+Development
+
+VS Code/Antigravity IDE, Git and GitHub
+
+Future Big Data
+
+PySpark/Hadoop and Kafka
+
+22. Security & Governance
+
+RBAC enforced on every protected API and UI route.
+
+Secure password hashing; never store plain passwords.
+
+Keep AI/provider API keys on the server; never expose them in the frontend.
+
+Validate file type, size and content before processing.
+
+Isolate user/company data.
+
+Audit login, role changes, imports, tender creation/edit/publication, document actions and sensitive operations.
+
+Use soft-delete/archive strategy where appropriate.
+
+Send only authorized verified context to AI services.
+
+Treat AI recommendations as advisory and not a replacement for human procurement decisions.
+
+23. Main UI / Screen Map
+
+Area
+
+Screens
+
+Public/Auth
+
+Login, Register, Forgot Password, Landing/Home
+
+User
+
+Dashboard, Company Profile, Search Tenders, Tender Details, Compare Tenders
+
+Personalization
+
+My Tenders, My Favourites, My Preferences, Alerts, Calendar
+
+AI
+
+AI Recommendation, Eligibility Checker, Tender Document Analyzer, Ask Your Tender AI
+
+Admin
+
+Dashboard, User Management, Organization/Authority Management, Import Data, Tender Data, Analytics, Audit Logs
+
+Authority
+
+Dashboard, Create Tender, Drafts, Published Tenders, Documents, Tender Analytics
+
+Evaluator
+
+Dashboard and assigned evaluation pages where bidding is enabled
+
+24. End-to-End Demonstration Scenario
+
+Open the website; Login/Register appears first.
+
+Register as Company/User, verify/login and complete Company Profile.
+
+Set industry, category, location, value range, keywords and deadline preferences.
+
+Search and filter tenders from the tender database.
+
+Open a tender and review details/documents.
+
+Run Eligibility Check and inspect matched/missing requirements.
+
+Run AI Recommendation and inspect match score and reasons.
+
+Compare the selected tender with other tenders.
+
+Save/Favourite and configure deadline/new-match alerts.
+
+Use Ask Your Tender AI for grounded questions.
+
+Admin imports or refreshes tender data through CSV/Excel.
+
+Super Admin authorizes a Tender Authority.
+
+Authorized Authority creates and publishes an official tender.
+
+User receives a matching alert and reviews the opportunity.
+
+Admin/Authority views analytics and audit history.
+
+25. Core vs Premium Modules
+
+Module
+
+Key Features
+
+Priority
+
+Authentication & User Management
+
+Register, Login, JWT, Logout, Roles, Profile, RBAC
+
+Must Have
+
+Tender Discovery
+
+Search, Filter, Sort, Details, Pagination, Similar Tenders
+
+Must Have
+
+My Tenders
+
+Save, Favourite, Remove, Notes, Recently Viewed
+
+Must Have
+
+Personalized Alerts
+
+Preferences, Matching, Notifications, Deadline Alerts
+
+Must Have
+
+AI Recommendation
+
+Match Score, Reasons, Gaps, Similar Opportunities
+
+High Impact
+
+Eligibility Checker
+
+Requirement comparison and missing criteria
+
+High Impact
+
+Tender Document AI
+
+Extraction, summary, checklist, document Q&A
+
+High Impact
+
+Ask Your Tender AI
+
+Grounded natural-language tender assistant
+
+High Impact
+
+Tender Comparison
+
+Side-by-side comparison and export
+
+High Impact
+
+Authority Publishing
+
+Controlled create/edit/publish workflow
+
+High Impact
+
+Analytics & Intelligence
+
+KPIs, trends, data quality, insights
+
+High Impact
+
+Security & Audit
+
+RBAC, logs, file validation, data isolation
+
+Must Have
+
+26. Project Rules
+
+First screen = Login/Register.
+
+Normal users cannot create or publish official tenders.
+
+Only Super Admin can grant Tender Authority permission.
+
+Tender Authority can manage only its authorized organization/tender scope.
+
+Account data must be stored securely in the system database.
+
+AI must use verified tender/profile context and must not invent numerical facts.
+
+Recommendations, eligibility results and anomaly flags are decision-support features, not guarantees.
+
+Sensitive administrative and publishing actions must be auditable.
+
+27. Future Scope
+
+OCR for scanned tender documents.
+
+Semantic/vector search for natural-language tender discovery.
+
+Gujarati/Hindi/English multilingual interface.
+
+Kafka + Spark streaming analytics.
+
+PySpark/Hadoop large-scale historical tender analytics.
+
+Cloud deployment and object storage.
+
+Digital signature/e-sign workflow where legally and technically appropriate.
+
+Mobile application.
+
+Authorized external procurement portal integrations.
+
+28. Final Expected Result
+
+The final product should behave like a professional tender-intelligence platform rather than a basic CRUD application. The strongest presentation flow is:
+
+Login → Profile → Preferences → Search → Tender Details → Compare → Eligibility → AI Recommendation → Save/Alert → AI Q&A
+
+A separate controlled flow supports Super Admin and Authorized Tender Authority operations for official tender publishing. The supplied project specification emphasizes secure authentication, personalized discovery, advanced search, saved/favourite tenders, alerts, AI recommendation, eligibility analysis, document intelligence, tender comparison, analytics, reporting and complete auditability.
+
+29. Presentation / Viva Highlights
+
+The project combines Full-Stack development, AI, analytics and secure role-based access in one integrated system.
+
+The most distinctive features are explainable tender matching, eligibility checking, document intelligence and grounded Tender AI Q&A.
+
+The system has clear role boundaries so normal users cannot publish official tenders.
+
+The project demonstrates practical database, API, security, file-processing, analytics and AI concepts.
+
+The architecture is scalable: a future version can add OCR, vector search, multilingual support, cloud deployment and big-data processing.
+
+For demonstration, use a controlled seed dataset and show the complete user journey from login to AI recommendation and alerts.
