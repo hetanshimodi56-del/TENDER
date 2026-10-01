@@ -14,6 +14,7 @@ import {
   TrendingUp,
   FileCheck
 } from 'lucide-react';
+import confetti from 'canvas-confetti';
 import { formatINR } from './TenderCard';
 import { api } from '../services/api';
 
@@ -71,6 +72,14 @@ export default function SubmitBidModal({
         delivery_timeline_months: Number(deliveryMonths),
         documents
       });
+
+      if (typeof confetti === 'function') {
+        confetti({
+          particleCount: 75,
+          spread: 60,
+          origin: { y: 0.6 }
+        });
+      }
 
       if (onShowToast) {
         onShowToast(`Bid of ₹${Number(bidAmount).toLocaleString('en-IN')} submitted successfully for #${tender.tender_reference_no}!`, 'success');

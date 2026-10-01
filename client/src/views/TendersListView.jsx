@@ -266,7 +266,7 @@ export default function TendersListView({
       }}>
         {/* Metric 1 */}
         <div 
-          className="saas-card"
+          className="saas-card card-interactive"
           onClick={() => { setActiveTab('all'); fetchTenders(); }}
           style={{
             padding: '16px',
@@ -286,7 +286,7 @@ export default function TendersListView({
 
         {/* Metric 2 */}
         <div 
-          className="saas-card"
+          className="saas-card card-interactive"
           onClick={() => {
             setActiveTab(activeTab === 'high_match' ? 'all' : 'high_match');
             if (onShowToast) onShowToast('Filtered to 60 High AI Match Tenders');
@@ -309,7 +309,7 @@ export default function TendersListView({
 
         {/* Metric 3 */}
         <div 
-          className="saas-card"
+          className="saas-card card-interactive"
           onClick={() => {
             setActiveTab(activeTab === 'closing_soon' ? 'all' : 'closing_soon');
             if (onShowToast) onShowToast('Filtered to Tenders Closing within 7 Days');
@@ -332,7 +332,7 @@ export default function TendersListView({
 
         {/* Metric 4 */}
         <div 
-          className="saas-card"
+          className="saas-card card-interactive"
           onClick={() => {
             setActiveTab(activeTab === 'saved' ? 'all' : 'saved');
             if (onShowToast) onShowToast('Filtered to Shortlisted Tenders');
@@ -356,8 +356,8 @@ export default function TendersListView({
 
       {/* 2.5 Smart AI Natural Language Search Box */}
       <div 
+        className="haikei-mesh-banner"
         style={{
-          background: 'var(--bg-card, #ffffff)',
           border: '1px solid var(--border-card, #e2e8f0)',
           borderRadius: 14,
           padding: '16px 20px',
@@ -720,7 +720,7 @@ export default function TendersListView({
             return (
               <div
                 key={tender.id}
-                className="saas-card"
+                className="saas-card card-interactive"
                 style={{
                   padding: '20px 24px',
                   display: 'grid',
@@ -779,8 +779,12 @@ export default function TendersListView({
                       background: '#eef2ff',
                       padding: '2px 8px',
                       borderRadius: 4,
-                      border: '1px solid #c7d2fe'
+                      border: '1px solid #c7d2fe',
+                      display: 'inline-flex',
+                      alignItems: 'center',
+                      gap: 6
                     }}>
+                      <span className="radar-live-dot" title="Live active tender" />
                       {tender.tender_reference_no}
                     </span>
 
@@ -794,17 +798,24 @@ export default function TendersListView({
                       {tender.location_city ? `${tender.location_city}, ` : ''}{tender.location_state}
                     </span>
 
-                    <span style={{
-                      fontSize: '0.7rem',
-                      fontWeight: 700,
-                      color: diffDays <= 3 ? '#dc2626' : (diffDays <= 7 ? '#d97706' : '#059669'),
-                      display: 'flex',
-                      alignItems: 'center',
-                      gap: 4
-                    }}>
-                      <Clock size={12} />
-                      Closing: {closingDate.toLocaleDateString('en-IN', { day: '2-digit', month: '2-digit', year: 'numeric' })} ({diffDays}d left)
-                    </span>
+                    {diffDays <= 3 ? (
+                      <span className="ticking-urgency-badge">
+                        <Clock size={12} />
+                        Closes in {diffDays === 0 ? 'Today (<24h)' : `${diffDays}d left`}
+                      </span>
+                    ) : (
+                      <span style={{
+                        fontSize: '0.7rem',
+                        fontWeight: 700,
+                        color: diffDays <= 7 ? '#d97706' : '#059669',
+                        display: 'flex',
+                        alignItems: 'center',
+                        gap: 4
+                      }}>
+                        <Clock size={12} />
+                        Closing: {closingDate.toLocaleDateString('en-IN', { day: '2-digit', month: '2-digit', year: 'numeric' })} ({diffDays}d left)
+                      </span>
+                    )}
                   </div>
 
                   {/* Title (Normal Casing, Bold, Clickable) */}

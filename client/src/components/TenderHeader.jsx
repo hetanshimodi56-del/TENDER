@@ -23,6 +23,7 @@ export default function TenderHeader({
   onOpenVault,
   onOpenAIAssistant,
   onOpenLogin,
+  onOpenCommandPalette,
   onShowToast
 }) {
   const { t } = useLanguage();
@@ -128,39 +129,44 @@ export default function TenderHeader({
           <Menu size={18} />
         </button>
 
-        {/* Global Quick Search Input */}
-        <div style={{
-          display: 'flex',
-          alignItems: 'center',
-          gap: 8,
-          background: '#f8fafc',
-          border: '1px solid #e2e8f0',
-          borderRadius: 8,
-          padding: '7px 12px',
-          width: 280,
-          transition: 'border-color 0.15s ease'
-        }}>
-          <Search size={14} color="#94a3b8" />
-          <input
-            type="text"
-            placeholder="Search tenders, GEM IDs, buyers..."
-            style={{
-              border: 'none',
-              background: 'transparent',
-              outline: 'none',
-              fontSize: '0.8rem',
-              color: '#1e293b',
-              width: '100%'
-            }}
-          />
+        {/* Global Quick Search Input (Click or Ctrl+K triggers Command Palette) */}
+        <div 
+          onClick={() => { if (onOpenCommandPalette) onOpenCommandPalette(); }}
+          style={{
+            display: 'flex',
+            alignItems: 'center',
+            gap: 8,
+            background: '#f8fafc',
+            border: '1px solid #e2e8f0',
+            borderRadius: 8,
+            padding: '7px 12px',
+            width: 280,
+            cursor: 'pointer',
+            transition: 'all 0.15s ease'
+          }}
+          onMouseEnter={e => { e.currentTarget.style.borderColor = '#00796b'; e.currentTarget.style.background = '#f0fdfa'; }}
+          onMouseLeave={e => { e.currentTarget.style.borderColor = '#e2e8f0'; e.currentTarget.style.background = '#f8fafc'; }}
+          title="Press Ctrl+K or Cmd+K to search anything"
+        >
+          <Search size={14} color="#00796b" />
+          <span style={{
+            fontSize: '0.8rem',
+            color: '#64748b',
+            flex: 1,
+            userSelect: 'none'
+          }}>
+            Search tenders, GEM IDs...
+          </span>
           <kbd style={{
             fontSize: '0.62rem',
             background: '#ffffff',
             border: '1px solid #cbd5e1',
             borderRadius: 4,
-            padding: '1px 5px',
-            color: '#64748b',
-            fontFamily: 'monospace'
+            padding: '2px 6px',
+            color: '#00796b',
+            fontFamily: 'monospace',
+            fontWeight: 700,
+            boxShadow: '0 1px 2px rgba(0,0,0,0.05)'
           }}>⌘K</kbd>
         </div>
 

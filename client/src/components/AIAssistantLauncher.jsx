@@ -7,6 +7,7 @@ export default function AIAssistantLauncher({ onClick, isOpen, hasActiveTender }
   return (
     <button
       onClick={onClick}
+      className="floating-ai-aura"
       style={{
         position: 'fixed',
         bottom: 24,

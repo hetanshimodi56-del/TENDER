@@ -36,6 +36,7 @@ import AccessDenied from './components/AccessDenied';
 
 import AITenderAssistant from './components/AITenderAssistant';
 import AIAssistantLauncher from './components/AIAssistantLauncher';
+import CommandPalette from './components/CommandPalette';
 
 import { api } from './services/api';
 
@@ -191,6 +192,7 @@ export default function App() {
 
   // Authentication & Guest Navigation State - Default to showing Login if not logged in
   const [showAuthModal, setShowAuthModal] = useState(true);
+  const [showCommandPalette, setShowCommandPalette] = useState(false);
   const [authInitialRole, setAuthInitialRole] = useState('company_user');
   const [authMessage, setAuthMessage] = useState('');
   const [pendingTenderId, setPendingTenderId] = useState(null);
@@ -265,7 +267,20 @@ export default function App() {
       if (urlTab) setCurrentTab(urlTab);
     };
     window.addEventListener('popstate', handlePopState);
-    return () => window.removeEventListener('popstate', handlePopState);
+
+    // Global Command Palette (Ctrl+K or Cmd+K)
+    const handleGlobalKeyDown = (e) => {
+      if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 'k') {
+        e.preventDefault();
+        setShowCommandPalette(prev => !prev);
+      }
+    };
+    window.addEventListener('keydown', handleGlobalKeyDown);
+
+    return () => {
+      window.removeEventListener('popstate', handlePopState);
+      window.removeEventListener('keydown', handleGlobalKeyDown);
+    };
   }, []);
 
   const checkAuth = async () => {
@@ -495,6 +510,7 @@ export default function App() {
           onOpenVault={() => user ? setShowVaultModal(true) : handleRequireLogin(null, 'company_user')}
           onOpenAIAssistant={() => handleOpenAskAI(null)}
           onOpenLogin={() => { setAuthMessage(''); setAuthInitialRole('viewer'); setShowAuthModal(true); }}
+          onOpenCommandPalette={() => setShowCommandPalette(true)}
           onShowToast={showToast}
         />
 
@@ -750,6 +766,16 @@ export default function App() {
       {showMISModal && (
         <MISReportsModal onClose={() => setShowMISModal(false)} />
       )}
+
+      {/* Global Command Palette (Ctrl+K / Cmd+K Spotlight Search) */}
+      <CommandPalette
+        isOpen={showCommandPalette}
+        onClose={() => setShowCommandPalette(false)}
+        onNavigateToTab={navigateToTab}
+        onSelectTender={handleOpenDetails}
+        onOpenAIAssistant={() => handleOpenAskAI(null)}
+        onOpenVault={() => user ? setShowVaultModal(true) : handleRequireLogin(null, 'company_user')}
+      />
 
       {showFilesModal && (
         <FileManagerModal onClose={() => setShowFilesModal(false)} />
