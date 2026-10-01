@@ -267,14 +267,86 @@ body.dark-mode span[style*="background: #f8fafc"] {
   background: #94a3b8;
 }
 
+html, body, #root {
+  height: 100%;
+  width: 100%;
+  margin: 0;
+  padding: 0;
+  overflow: hidden;
+}
+
 body {
   font-family: var(--font-sans);
   background: var(--bg-gradient);
-  background-attachment: fixed;
   color: var(--text-main);
-  min-height: 100vh;
   line-height: 1.5;
   -webkit-font-smoothing: antialiased;
+}
+
+/* Independent Scrolling Utility Classes */
+.sidebar-scroll-container {
+  overflow-y: auto;
+  overflow-x: hidden;
+  scrollbar-width: thin;
+  scrollbar-color: #cbd5e1 transparent;
+}
+
+.sidebar-scroll-container::-webkit-scrollbar {
+  width: 5px;
+}
+
+.sidebar-scroll-container::-webkit-scrollbar-thumb {
+  background: #cbd5e1;
+  border-radius: 4px;
+}
+
+.main-scroll-container {
+  overflow-y: auto;
+  overflow-x: hidden;
+  height: calc(100vh - 60px);
+  scrollbar-width: thin;
+  scrollbar-color: #cbd5e1 #f8fafc;
+}
+
+.main-scroll-container::-webkit-scrollbar {
+  width: 7px;
+}
+
+.main-scroll-container::-webkit-scrollbar-thumb {
+  background: #cbd5e1;
+  border-radius: 4px;
+}
+
+/* Security & Anti-Theft Watermark & Protection Classes */
+.tender-secure-watermark {
+  position: relative;
+}
+
+.tender-secure-watermark::after {
+  content: 'CONFIDENTIAL • OFFICIAL E-PROCUREMENT PORTAL • VERIFIED ACCESS';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%) rotate(-25deg);
+  font-size: 1.5rem;
+  font-weight: 900;
+  color: rgba(15, 23, 42, 0.035);
+  pointer-events: none;
+  white-space: nowrap;
+  z-index: 1;
+  letter-spacing: 0.15em;
+  user-select: none;
+}
+
+[data-theme='dark'] .tender-secure-watermark::after {
+  color: rgba(255, 255, 255, 0.04);
+}
+
+.protected-content {
+  -webkit-user-select: text;
+  -moz-user-select: text;
+  -ms-user-select: text;
+  user-select: text;
 }
 
 h1, h2, h3, h4, h5, h6 {

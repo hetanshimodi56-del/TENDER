@@ -103,10 +103,10 @@ exports.getTenders = (req, res) => {
       return 0;
     });
 
-    // Pagination
+    // Pagination with Anti-Scraping Maximum Limit Cap
     const totalCount = tenders.length;
-    const pageNum = parseInt(page);
-    const limitNum = parseInt(limit);
+    const pageNum = Math.max(parseInt(page) || 1, 1);
+    const limitNum = Math.min(Math.max(parseInt(limit) || 20, 1), 50); // Enforce max 50 items per query to prevent database scraping
     const startIndex = (pageNum - 1) * limitNum;
     const paginatedTenders = tenders.slice(startIndex, startIndex + limitNum);
 
@@ -165,6 +165,11 @@ exports.getTenderById = (req, res) => {
         isSaved = true;
         isFavourite = !!saved.is_favourite;
       }
+    }
+
+    // Security Audit Log: Track access to published tender documents & details
+    if (req.user) {
+      logAudit(req.user.id, `Viewed Tender Details`, 'Tender', tender.id, { tender_reference_no: tender.tender_reference_no }, req.ip);
     }
 
     res.json({

@@ -22,10 +22,21 @@ import {
 } from 'lucide-react';
 import { api } from '../services/api';
 
-export default function AuthModal({ onLoginSuccess }) {
+export default function AuthModal({ 
+  onLoginSuccess, 
+  onClose, 
+  onBrowseGuest, 
+  initialRole = 'company_user', 
+  message = '' 
+}) {
   const [isRegister, setIsRegister] = useState(false);
-  const [selectedRole, setSelectedRole] = useState('company_user'); // super_admin, tender_authority, company_user, viewer
-  const [identifier, setIdentifier] = useState('BID001'); // Accepts User ID or Email
+  const [selectedRole, setSelectedRole] = useState(initialRole); // super_admin, tender_authority, company_user, viewer
+  const [identifier, setIdentifier] = useState(() => {
+    if (initialRole === 'viewer') return 'VIEW001';
+    if (initialRole === 'super_admin') return 'ADM001';
+    if (initialRole === 'tender_authority') return 'AUTH001';
+    return 'BID001';
+  });
   const [password, setPassword] = useState('Password@123');
   const [showPassword, setShowPassword] = useState(false);
   const [rememberMe, setRememberMe] = useState(true);
@@ -240,8 +251,34 @@ export default function AuthModal({ onLoginSuccess }) {
         overflow: 'hidden',
         border: '1px solid rgba(255, 255, 255, 0.12)',
         boxShadow: '0 25px 70px -15px rgba(0,0,0,0.85)',
-        background: '#0d1322'
+        background: '#0d1322',
+        position: 'relative'
       }}>
+        {onClose && (
+          <button
+            onClick={onClose}
+            style={{
+              position: 'absolute',
+              top: 16,
+              right: 16,
+              background: 'rgba(255, 255, 255, 0.1)',
+              border: 'none',
+              borderRadius: '50%',
+              width: 32,
+              height: 32,
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              color: '#94a3b8',
+              cursor: 'pointer',
+              zIndex: 30,
+              transition: 'all 0.15s ease'
+            }}
+            title="Close"
+          >
+            <X size={18} />
+          </button>
+        )}
         {/* Left Side: Brand Showcase & Role Selection */}
         <div style={{
           padding: '40px 36px',
@@ -393,6 +430,24 @@ export default function AuthModal({ onLoginSuccess }) {
 
         {/* Right Side: Login & Registration Form */}
         <div style={{ padding: '40px 36px', display: 'flex', flexDirection: 'column', justifyContent: 'center' }}>
+          {message && (
+            <div style={{
+              background: 'rgba(2, 132, 199, 0.15)',
+              border: '1px solid rgba(2, 132, 199, 0.4)',
+              color: '#38bdf8',
+              padding: '10px 14px',
+              borderRadius: 8,
+              fontSize: '0.82rem',
+              marginBottom: 16,
+              display: 'flex',
+              alignItems: 'center',
+              gap: 8
+            }}>
+              <AlertCircle size={16} />
+              <span>{message}</span>
+            </div>
+          )}
+
           {/* Sign In vs Company Registration Switcher */}
           <div style={{
             display: 'flex',
@@ -702,8 +757,36 @@ export default function AuthModal({ onLoginSuccess }) {
             </button>
           </form>
 
+          {onBrowseGuest && (
+            <button
+              type="button"
+              onClick={onBrowseGuest}
+              style={{
+                marginTop: 14,
+                width: '100%',
+                padding: '10px 14px',
+                borderRadius: 8,
+                background: 'rgba(255, 255, 255, 0.05)',
+                border: '1px solid rgba(255, 255, 255, 0.15)',
+                color: '#38bdf8',
+                fontWeight: 700,
+                fontSize: '0.82rem',
+                cursor: 'pointer',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                gap: 8,
+                transition: 'all 0.15s ease'
+              }}
+              onMouseEnter={e => e.currentTarget.style.background = 'rgba(56, 189, 248, 0.1)'}
+              onMouseLeave={e => e.currentTarget.style.background = 'rgba(255, 255, 255, 0.05)'}
+            >
+              <Eye size={15} /> Browse Public Tenders as Guest (No Login Required) →
+            </button>
+          )}
+
           {/* Security & Architecture Notice */}
-          <div style={{ marginTop: 20, textAlign: 'center', fontSize: '0.72rem', color: '#64748b' }}>
+          <div style={{ marginTop: 18, textAlign: 'center', fontSize: '0.72rem', color: '#64748b' }}>
             🔒 Authenticated via User ID + RBAC + HTTP-Only Session Cookies + JWT API Tokens.
           </div>
         </div>

@@ -22,6 +22,7 @@ export default function TenderHeader({
   onOpenAddTender,
   onOpenVault,
   onOpenAIAssistant,
+  onOpenLogin,
   onShowToast
 }) {
   const { t } = useLanguage();
@@ -299,99 +300,123 @@ export default function TenderHeader({
         </button>
 
 
-        {/* Verified Role Badge */}
-        <div style={{
-          background: roleInfo.bg,
-          border: `1px solid ${roleInfo.color}30`,
-          borderRadius: 8,
-          padding: '5px 11px',
-          fontSize: '0.75rem',
-          fontWeight: 700,
-          color: roleInfo.color,
-          display: 'flex',
-          alignItems: 'center',
-          gap: 6
-        }} title={`Authenticated Role: ${user?.role}`}>
-          <span>{roleInfo.icon}</span>
-          <span>{roleInfo.label}</span>
-        </div>
-
-        {/* Subtle Vertical Divider */}
-        <div style={{ width: 1, height: 24, background: '#e2e8f0', margin: '0 2px' }}></div>
-
-        {/* User Profile Info & Logout */}
-        <div style={{
-          display: 'flex',
-          alignItems: 'center',
-          gap: 10
-        }}>
-          {/* Avatar Circle */}
-          <div style={{
-            width: 32,
-            height: 32,
-            borderRadius: '50%',
-            background: '#e0f2fe',
-            color: '#0284c7',
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            fontWeight: 800,
-            fontSize: '0.8rem',
-            border: '1px solid #bae6fd'
-          }}>
-            {user?.name?.charAt(0) || 'U'}
-          </div>
-
-          {/* Name & User ID */}
-          <div style={{ display: 'flex', flexDirection: 'column', lineHeight: 1.15 }}>
-            <span style={{ fontSize: '0.82rem', fontWeight: 700, color: '#1e293b' }}>
-              {user?.name?.split(' ')[0] || 'User'}
-            </span>
-            {user?.user_id && (
-              <span style={{ 
-                fontSize: '0.64rem', 
-                fontWeight: 800, 
-                color: '#00796b', 
-                background: '#e6f4ea', 
-                padding: '1px 5px', 
-                borderRadius: 4, 
-                marginTop: 2,
-                display: 'inline-block' 
-              }}>
-                {user.user_id}
-              </span>
-            )}
-          </div>
-
-          {/* Logout Icon Button */}
-          <button
-            onClick={onLogout}
-            style={{
-              width: 32,
-              height: 32,
-              borderRadius: 6,
-              border: 'none',
-              background: 'transparent',
-              cursor: 'pointer',
-              color: '#94a3b8',
+        {/* Verified Role Badge or Guest Sign-In */}
+        {user ? (
+          <>
+            <div style={{
+              background: roleInfo.bg,
+              border: `1px solid ${roleInfo.color}30`,
+              borderRadius: 8,
+              padding: '5px 11px',
+              fontSize: '0.75rem',
+              fontWeight: 700,
+              color: roleInfo.color,
               display: 'flex',
               alignItems: 'center',
-              justifyContent: 'center',
-              transition: 'all 0.15s ease'
+              gap: 6
+            }} title={`Authenticated Role: ${user?.role}`}>
+              <span>{roleInfo.icon}</span>
+              <span>{roleInfo.label}</span>
+            </div>
+
+            {/* Subtle Vertical Divider */}
+            <div style={{ width: 1, height: 24, background: '#e2e8f0', margin: '0 2px' }}></div>
+
+            {/* User Profile Info & Logout */}
+            <div style={{
+              display: 'flex',
+              alignItems: 'center',
+              gap: 10
+            }}>
+              {/* Avatar Circle */}
+              <div style={{
+                width: 32,
+                height: 32,
+                borderRadius: '50%',
+                background: '#e0f2fe',
+                color: '#0284c7',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                fontWeight: 800,
+                fontSize: '0.8rem',
+                border: '1px solid #bae6fd'
+              }}>
+                {user?.name?.charAt(0) || 'U'}
+              </div>
+
+              {/* Name & User ID */}
+              <div style={{ display: 'flex', flexDirection: 'column', lineHeight: 1.15 }}>
+                <span style={{ fontSize: '0.82rem', fontWeight: 700, color: '#1e293b' }}>
+                  {user?.name?.split(' ')[0] || 'User'}
+                </span>
+                {user?.user_id && (
+                  <span style={{ 
+                    fontSize: '0.64rem', 
+                    fontWeight: 800, 
+                    color: '#00796b', 
+                    background: '#e6f4ea', 
+                    padding: '1px 5px', 
+                    borderRadius: 4, 
+                    marginTop: 2,
+                    display: 'inline-block' 
+                  }}>
+                    {user.user_id}
+                  </span>
+                )}
+              </div>
+
+              {/* Logout Icon Button */}
+              <button
+                onClick={onLogout}
+                style={{
+                  width: 32,
+                  height: 32,
+                  borderRadius: 6,
+                  border: 'none',
+                  background: 'transparent',
+                  cursor: 'pointer',
+                  color: '#94a3b8',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  transition: 'all 0.15s ease'
+                }}
+                onMouseEnter={e => {
+                  e.currentTarget.style.color = '#ef4444';
+                  e.currentTarget.style.background = '#fef2f2';
+                }}
+                onMouseLeave={e => {
+                  e.currentTarget.style.color = '#94a3b8';
+                  e.currentTarget.style.background = 'transparent';
+                }}
+                title="Sign out of TenderHub"
+              >
+                <LogOut size={16} />
+              </button>
+            </div>
+          </>
+        ) : (
+          <button
+            onClick={onOpenLogin}
+            style={{
+              background: 'linear-gradient(135deg, #00796b 0%, #004d40 100%)',
+              color: '#ffffff',
+              border: 'none',
+              borderRadius: 8,
+              padding: '7px 16px',
+              fontSize: '0.82rem',
+              fontWeight: 700,
+              cursor: 'pointer',
+              display: 'flex',
+              alignItems: 'center',
+              gap: 6,
+              boxShadow: '0 2px 8px rgba(0, 121, 107, 0.3)'
             }}
-            onMouseEnter={e => {
-              e.currentTarget.style.color = '#ef4444';
-              e.currentTarget.style.background = '#fef2f2';
-            }}
-            onMouseLeave={e => {
-              e.currentTarget.style.color = '#94a3b8';
-              e.currentTarget.style.background = 'transparent';
-            }}
-            title="Sign out of TenderHub"
           >
-            <LogOut size={16} />
+            <span>🔐</span> Sign In / Register
           </button>
-        </div>
+        )}
 
       </div>
     </header>

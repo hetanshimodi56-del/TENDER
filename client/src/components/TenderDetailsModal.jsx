@@ -51,6 +51,7 @@ export default function TenderDetailsModal({
   onOpenBOQ,
   onSubmitBid,
   onOpenAskAI,
+  onLoginRequired,
   userRole = 'company_user'
 }) {
   const [activeTab, setActiveTab] = useState('overview'); // overview, eligibility, ai_doc, ask_ai, tasks_status
@@ -127,7 +128,7 @@ export default function TenderDetailsModal({
 
   return (
     <div className="modal-overlay" onClick={onClose}>
-      <div className="modal-content" onClick={e => e.stopPropagation()} style={{ maxWidth: 960, maxHeight: '92vh' }}>
+      <div className="modal-content tender-secure-watermark" onClick={e => e.stopPropagation()} style={{ maxWidth: 960, maxHeight: '92vh', overflowY: 'auto' }}>
         {/* Top Header */}
         <div style={{
           padding: '24px 28px',
@@ -678,12 +679,29 @@ export default function TenderDetailsModal({
                 fontWeight: 700
               }}
             >
-              <Bot size={16} /> Ask AI About This Tender
+              <Bot size={16} /> Ask AI
+            </button>
+
+            {/* Direct Official NIT/RFP Download Button */}
+            <button
+              className="btn btn-secondary"
+              onClick={() => downloadTenderRFP(tender)}
+              style={{
+                borderColor: '#00796b',
+                color: '#00796b',
+                fontWeight: 600,
+                display: 'flex',
+                alignItems: 'center',
+                gap: 5
+              }}
+              title="Download Official Notice Inviting Tender (NIT)"
+            >
+              <Download size={15} /> Download NIT Doc
             </button>
           </div>
 
           <div style={{ display: 'flex', gap: 10, flexWrap: 'wrap' }}>
-            {userRole === 'company_user' && (
+            {userRole === 'company_user' ? (
               <>
                 {onOpenBOQ && (
                   <button
@@ -748,6 +766,29 @@ export default function TenderDetailsModal({
                   </button>
                 )}
               </>
+            ) : (
+              (tender.status === 'published' || tender.status === 'closing_soon') && (
+                <button
+                  className="btn btn-primary"
+                  onClick={() => {
+                    if (onLoginRequired) {
+                      onClose();
+                      onLoginRequired(tender);
+                    } else {
+                      downloadTenderRFP(tender);
+                    }
+                  }}
+                  style={{
+                    background: 'linear-gradient(135deg, #0284c7, #0369a1)',
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: 6
+                  }}
+                  title="Login as Bidder / Company to submit bid"
+                >
+                  <Send size={15} /> Login to Bid / Apply
+                </button>
+              )
             )}
 
             <button className="btn btn-secondary" onClick={onClose}>

@@ -12,6 +12,48 @@ const db = require('./db/db');
 const app = express();
 const PORT = process.env.PORT || 5000;
 
+// Enterprise Security Headers to prevent clickjacking, MIME sniffing, data theft & scraping
+app.use((req, res, next) => {
+  res.setHeader('X-Frame-Options', 'SAMEORIGIN');
+  res.setHeader('X-Content-Type-Options', 'nosniff');
+  res.setHeader('X-XSS-Protection', '1; mode=block');
+  res.setHeader('Referrer-Policy', 'strict-origin-when-cross-origin');
+  res.setHeader('Permissions-Policy', 'camera=(), microphone=(), geolocation=()');
+  res.removeHeader('X-Powered-By');
+  next();
+});
+
+// Anti-Scraping & Rate Limiting Protection Middleware
+const requestCounts = new Map();
+const RATE_LIMIT_WINDOW_MS = 60 * 1000; // 1 minute window
+const MAX_REQUESTS_PER_WINDOW = 120; // 120 reqs/min max
+
+app.use('/api', (req, res, next) => {
+  if (req.path === '/health') return next();
+
+  const clientIp = req.headers['x-forwarded-for'] || req.socket.remoteAddress || '127.0.0.1';
+  const now = Date.now();
+
+  let clientRecord = requestCounts.get(clientIp);
+  if (!clientRecord || (now - clientRecord.startTime) > RATE_LIMIT_WINDOW_MS) {
+    clientRecord = { count: 1, startTime: now };
+    requestCounts.set(clientIp, clientRecord);
+  } else {
+    clientRecord.count++;
+  }
+
+  // Prevent automated bulk data scraping
+  if (clientRecord.count > MAX_REQUESTS_PER_WINDOW) {
+    return res.status(429).json({
+      success: false,
+      message: 'Rate limit exceeded: Too many requests. Automated data scraping & harvesting is prohibited by security policy.',
+      retryAfterSeconds: Math.ceil((RATE_LIMIT_WINDOW_MS - (now - clientRecord.startTime)) / 1000)
+    });
+  }
+
+  next();
+});
+
 // Enable CORS with Credentials for frontend & API clients
 app.use(cors({
   origin: true,
@@ -44,15 +86,6 @@ app.use(express.urlencoded({ extended: true, limit: '20mb' }));
 app.use('/uploads', express.static(path.join(__dirname, '..', 'uploads')));
 
 // Root Route & Health Check
-app.get('/', (req, res) => {
-  res.json({
-    status: 'online',
-    service: 'AI E-Tender Platform API Backend',
-    message: 'Backend server is running successfully.',
-    health_check: '/api/health'
-  });
-});
-
 app.get('/api/health', (req, res) => {
   res.json({
     status: 'online',
@@ -61,6 +94,19 @@ app.get('/api/health', (req, res) => {
     tenders_count: db.count('tenders'),
     users_count: db.count('users'),
     timestamp: new Date().toISOString()
+  });
+});
+
+app.get('/', (req, res, next) => {
+  const clientDist = path.join(__dirname, '..', '..', 'client', 'dist');
+  if (require('fs').existsSync(clientDist)) {
+    return res.sendFile(path.join(clientDist, 'index.html'));
+  }
+  res.json({
+    status: 'online',
+    service: 'AI E-Tender Platform API Backend',
+    message: 'Backend server is running successfully.',
+    health_check: '/api/health'
   });
 });
 

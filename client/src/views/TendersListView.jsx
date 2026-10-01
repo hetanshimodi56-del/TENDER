@@ -22,7 +22,8 @@ import {
   Layers,
   Award,
   Bot,
-  MessageSquare
+  MessageSquare,
+  Eye
 } from 'lucide-react';
 import { formatINR } from '../components/TenderCard';
 import { api } from '../services/api';
@@ -859,6 +860,30 @@ export default function TendersListView({
 
                   {/* Action Buttons Row */}
                   <div style={{ display: 'flex', flexDirection: 'column', gap: 6, width: '100%' }}>
+                    <button
+                      onClick={() => onViewDetails(tender)}
+                      className="btn btn-sm"
+                      style={{
+                        width: '100%',
+                        borderRadius: 6,
+                        padding: '7px 12px',
+                        fontSize: '0.8rem',
+                        fontWeight: 700,
+                        justifyContent: 'center',
+                        background: 'linear-gradient(135deg, #00796b 0%, #004d40 100%)',
+                        color: '#ffffff',
+                        border: 'none',
+                        boxShadow: '0 2px 8px rgba(0, 121, 107, 0.3)',
+                        display: 'flex',
+                        alignItems: 'center',
+                        gap: 6,
+                        cursor: 'pointer'
+                      }}
+                      title="View full tender details, timeline, criteria & documentation"
+                    >
+                      <Eye size={14} /> View Details
+                    </button>
+
                     <button
                       onClick={() => onOpenAskAI?.(tender)}
                       className="btn btn-sm"

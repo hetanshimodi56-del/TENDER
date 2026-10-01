@@ -83,10 +83,10 @@ export default function TenderSidebar({
       ];
     }
 
-    if (role === 'viewer') {
+    if (role === 'viewer' || role === 'guest') {
       return [
-        { id: 'viewer', label: t('dashboard') || 'Viewer Dashboard', icon: LayoutDashboard },
         { id: 'tenders', label: t('browse_tenders') || 'Browse Tenders', icon: FileText },
+        { id: 'viewer', label: t('dashboard') || 'Public Portal', icon: LayoutDashboard },
         { id: 'viewer_categories', label: t('categories') || 'Categories', icon: Tag },
         { id: 'viewer_search', label: t('search') || 'Search Tenders', icon: Search }
       ];
@@ -108,6 +108,9 @@ export default function TenderSidebar({
   const navItems = getNavItems();
 
   const getRoleBadge = () => {
+    if (!user) {
+      return { label: 'Guest Visitor', color: '#0d9488', bg: '#ccfbf1', icon: Eye };
+    }
     switch (role) {
       case 'super_admin':
         return { label: 'Super Admin', color: '#7c3aed', bg: '#ede9fe', icon: Crown };
@@ -128,12 +131,16 @@ export default function TenderSidebar({
       width: collapsed ? 64 : 240,
       background: '#ffffff',
       borderRight: '1px solid #e2e8f0',
-      minHeight: '100vh',
+      height: '100vh',
+      maxHeight: '100vh',
       display: 'flex',
       flexDirection: 'column',
       flexShrink: 0,
+      overflow: 'hidden',
       transition: 'width 0.2s cubic-bezier(0.16, 1, 0.3, 1)',
-      userSelect: 'none'
+      userSelect: 'none',
+      position: 'relative',
+      zIndex: 20
     }}>
       {/* Brand Logo Header */}
       <div style={{
@@ -142,7 +149,8 @@ export default function TenderSidebar({
         alignItems: 'center',
         padding: '0 16px',
         borderBottom: '1px solid #e2e8f0',
-        gap: 10
+        gap: 10,
+        flexShrink: 0
       }}>
         <div 
           style={{ display: 'flex', alignItems: 'center', gap: 9, cursor: 'pointer' }} 
@@ -181,7 +189,7 @@ export default function TenderSidebar({
 
       {/* Role Pill Banner */}
       {!collapsed && (
-        <div style={{ padding: '12px 14px 4px' }}>
+        <div style={{ padding: '12px 14px 4px', flexShrink: 0 }}>
           <div style={{
             display: 'flex',
             alignItems: 'center',
@@ -197,17 +205,26 @@ export default function TenderSidebar({
                 {badge.label}
               </div>
               <div style={{ fontSize: '0.68rem', color: '#475569', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
-                {user?.name?.split(' ')[0] || 'User'}
+                {user?.name?.split(' ')[0] || (user ? 'User' : 'Public Auditor')}
               </div>
             </div>
           </div>
         </div>
       )}
 
-
-
-      {/* Main Navigation List */}
-      <div style={{ flex: 1, padding: '10px 10px', display: 'flex', flexDirection: 'column', gap: 4, overflowY: 'auto' }}>
+      {/* Main Navigation List with Independent Scrolling */}
+      <div 
+        className="sidebar-scroll-container" 
+        style={{ 
+          flex: 1, 
+          padding: '10px 10px', 
+          display: 'flex', 
+          flexDirection: 'column', 
+          gap: 4, 
+          overflowY: 'auto', 
+          overflowX: 'hidden' 
+        }}
+      >
         
         {/* Expandable Dashboard Item (as shown in images for Company/Vendor and Super Admin) */}
         {(role === 'company_user' || role === 'super_admin' || !role) && (
@@ -356,27 +373,54 @@ export default function TenderSidebar({
           fontSize: '0.72rem',
           display: 'flex',
           alignItems: 'center',
-          justifyContent: 'space-between'
+          justifyContent: 'space-between',
+          flexShrink: 0
         }}>
-          <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-            <div style={{ width: 8, height: 8, borderRadius: '50%', background: '#10b981', boxShadow: '0 0 6px #10b981' }}></div>
-            <div>
-              <div style={{ fontWeight: 700, color: '#1e293b' }}>{user?.name?.split(' ')[0] || 'TenderHub'}</div>
-              <div style={{ color: '#64748b', fontSize: '0.66rem' }}>Session Active • RBAC</div>
+          {user ? (
+            <>
+              <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+                <div style={{ width: 8, height: 8, borderRadius: '50%', background: '#10b981', boxShadow: '0 0 6px #10b981' }}></div>
+                <div>
+                  <div style={{ fontWeight: 700, color: '#1e293b' }}>{user?.name?.split(' ')[0] || 'TenderHub'}</div>
+                  <div style={{ color: '#64748b', fontSize: '0.66rem' }}>Session Active • RBAC</div>
+                </div>
+              </div>
+              {user?.user_id && (
+                <span style={{
+                  fontSize: '0.68rem',
+                  fontWeight: 800,
+                  color: '#00796b',
+                  background: '#e0f2f1',
+                  padding: '2px 7px',
+                  borderRadius: 6,
+                  border: '1px solid rgba(0,121,107,0.2)'
+                }}>
+                  {user.user_id}
+                </span>
+              )}
+            </>
+          ) : (
+            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', width: '100%' }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
+                <div style={{ width: 7, height: 7, borderRadius: '50%', background: '#0284c7' }}></div>
+                <span style={{ fontWeight: 600, color: '#475569' }}>Public Mode</span>
+              </div>
+              <button
+                onClick={() => setCurrentTab('login')}
+                style={{
+                  background: 'linear-gradient(135deg, #00796b, #004d40)',
+                  color: '#ffffff',
+                  border: 'none',
+                  borderRadius: 6,
+                  padding: '4px 10px',
+                  fontSize: '0.72rem',
+                  fontWeight: 700,
+                  cursor: 'pointer'
+                }}
+              >
+                Sign In
+              </button>
             </div>
-          </div>
-          {user?.user_id && (
-            <span style={{
-              fontSize: '0.68rem',
-              fontWeight: 800,
-              color: '#00796b',
-              background: '#e0f2f1',
-              padding: '2px 7px',
-              borderRadius: 6,
-              border: '1px solid rgba(0,121,107,0.2)'
-            }}>
-              {user.user_id}
-            </span>
           )}
         </div>
       )}

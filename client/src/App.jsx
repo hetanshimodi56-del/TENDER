@@ -45,11 +45,17 @@ function getAuthorizedHomeTab(role) {
   if (role === 'tender_authority' || role === 'authority') return 'authority';
   if (role === 'viewer' || role === 'user') return 'viewer';
   if (role === 'evaluator') return 'evaluator';
+  if (!role || role === 'guest') return 'tenders';
   return 'dashboard'; // company_user / vendor
 }
 
 // RBAC Route Guard: Validates whether a tab is allowed for user's role
 function checkTabPermission(tab, role) {
+  // Shared public discovery tabs allowed for everyone (including guests & public viewers)
+  if (tab === 'tenders' || tab === 'discover' || tab === 'viewer' || tab === 'viewer_categories' || tab === 'viewer_search') {
+    return true;
+  }
+
   if (!role) return false;
   const isSuperAdmin = role === 'super_admin' || role === 'admin';
   const isAuthority = role === 'tender_authority' || role === 'authority';
@@ -79,11 +85,11 @@ function checkTabPermission(tab, role) {
 
   // Normal User / Viewer tabs:
   if (tab === 'viewer' || tab.startsWith('viewer_')) {
-    return isViewer;
+    return isViewer || isVendor || isSuperAdmin;
   }
 
-  // Shared public discovery tabs
-  if (tab === 'tenders' || tab === 'discover' || tab === 'saved' || tab === 'recommended') {
+  // Saved / Recommended
+  if (tab === 'saved' || tab === 'recommended') {
     return isVendor || isViewer || isAuthority;
   }
 
@@ -176,12 +182,29 @@ export default function App() {
     category: 'All',
     state: 'All',
     statFilter: 'all',
-    subTab: 'fresh'
+    subTab: 'all'
   });
 
   // Global Floating AI Tender Assistant State
   const [isAIAssistantOpen, setIsAIAssistantOpen] = useState(false);
   const [aiAssistantTender, setAiAssistantTender] = useState(null);
+
+  // Authentication & Guest Navigation State - Default to showing Login if not logged in
+  const [showAuthModal, setShowAuthModal] = useState(true);
+  const [authInitialRole, setAuthInitialRole] = useState('company_user');
+  const [authMessage, setAuthMessage] = useState('');
+  const [pendingTenderId, setPendingTenderId] = useState(null);
+
+  const handleRequireLogin = (tender = null, preferredRole = 'company_user', customMsg = '') => {
+    if (tender) {
+      setPendingTenderId(tender.id);
+      setAuthMessage(customMsg || `Please sign in as Bidder / Viewer to proceed with tender ${tender.tender_reference_no}.`);
+    } else {
+      setAuthMessage(customMsg || '');
+    }
+    setAuthInitialRole(preferredRole);
+    setShowAuthModal(true);
+  };
 
   const handleOpenAskAI = (tender = null) => {
     setAiAssistantTender(tender);
@@ -223,6 +246,10 @@ export default function App() {
   };
 
   const navigateToTab = (tab) => {
+    if (tab === 'login') {
+      handleRequireLogin(null, 'viewer');
+      return;
+    }
     setCurrentTab(tab);
     const url = getUrlFromTab(tab);
     if (url && window.location.pathname !== url) {
@@ -245,12 +272,14 @@ export default function App() {
     const token = localStorage.getItem('etender_token');
     if (!token) {
       setLoading(false);
+      setShowAuthModal(true);
       return;
     }
 
     try {
       const res = await api.getMe();
       setUser(res.user);
+      setShowAuthModal(false);
       const urlTab = getTabFromUrl();
       if (urlTab) {
         setCurrentTab(urlTab);
@@ -263,6 +292,7 @@ export default function App() {
       localStorage.removeItem('etender_token');
       localStorage.removeItem('etender_session_id');
       setUser(null);
+      setShowAuthModal(true);
     } finally {
       setLoading(false);
     }
@@ -279,10 +309,21 @@ export default function App() {
 
   const handleLoginSuccess = (loggedInUser) => {
     setUser(loggedInUser);
+    setShowAuthModal(false);
+    setAuthMessage('');
     const homeTab = getAuthorizedHomeTab(loggedInUser.role);
     navigateToTab(homeTab);
     loadSavedTenders();
     showToast(`Welcome to TenderHub, ${loggedInUser.name}!`);
+
+    // If login was initiated from clicking a specific tender, open its detail page immediately!
+    if (pendingTenderId) {
+      const tenderIdToOpen = pendingTenderId;
+      setPendingTenderId(null);
+      setTimeout(() => {
+        handleOpenDetailsById(tenderIdToOpen);
+      }, 250);
+    }
   };
 
   const handleLogout = async () => {
@@ -292,9 +333,13 @@ export default function App() {
     localStorage.removeItem('etender_token');
     localStorage.removeItem('etender_session_id');
     setUser(null);
-    setCurrentTab('viewer');
+    setSelectedTender(null);
+    setTenderDetailsData(null);
+    setPendingTenderId(null);
+    setShowAuthModal(true); // Open Login Page directly on logout!
+    setAuthMessage('You have been logged out successfully. Sign in to your account.');
     window.history.replaceState(null, '', '/');
-    showToast('Signed out of platform successfully. Session destroyed.', 'info');
+    showToast('Signed out of platform successfully.', 'info');
   };
 
   // Open Tender Details Modal
@@ -405,44 +450,56 @@ export default function App() {
     );
   }
 
-  // If not logged in, show Auth First Screen
-  if (!user) {
-    return <AuthModal onLoginSuccess={handleLoginSuccess} />;
+  // If Auth modal is requested explicitly or guest requires login
+  if (!user && showAuthModal) {
+    return (
+      <AuthModal
+        onLoginSuccess={handleLoginSuccess}
+        onClose={() => setShowAuthModal(false)}
+        onBrowseGuest={() => {
+          setShowAuthModal(false);
+          navigateToTab('tenders');
+        }}
+        initialRole={authInitialRole}
+        message={authMessage}
+      />
+    );
   }
 
   return (
-    <div style={{ display: 'flex', minHeight: '100vh', background: 'var(--bg-gradient)' }}>
-      {/* BidSphere AI Left Sidebar */}
+    <div style={{ display: 'flex', height: '100vh', width: '100vw', overflow: 'hidden', background: 'var(--bg-gradient)' }}>
+      {/* BidSphere AI Left Sidebar (Fixed 100vh, Independent Scroll) */}
       <TenderSidebar
         currentTab={currentTab}
         setCurrentTab={navigateToTab}
         user={user}
         collapsed={sidebarCollapsed}
-        onOpenAddTender={() => setShowAddTenderModal(true)}
-        onOpenVault={() => setShowVaultModal(true)}
-        onOpenMIS={() => setShowMISModal(true)}
-        onOpenFiles={() => setShowFilesModal(true)}
-        onOpenRoles={() => setShowRolesModal(true)}
-        onOpenFinance={() => setShowFinanceModal(true)}
+        onOpenAddTender={() => user ? setShowAddTenderModal(true) : handleRequireLogin(null, 'company_user')}
+        onOpenVault={() => user ? setShowVaultModal(true) : handleRequireLogin(null, 'company_user')}
+        onOpenMIS={() => user ? setShowMISModal(true) : handleRequireLogin(null, 'company_user')}
+        onOpenFiles={() => user ? setShowFilesModal(true) : handleRequireLogin(null, 'company_user')}
+        onOpenRoles={() => user ? setShowRolesModal(true) : handleRequireLogin(null, 'super_admin')}
+        onOpenFinance={() => user ? setShowFinanceModal(true) : handleRequireLogin(null, 'company_user')}
       />
 
-      {/* Main Content Area */}
-      <div style={{ flex: 1, display: 'flex', flexDirection: 'column', minWidth: 0 }}>
-        {/* BidSphere AI Top Header */}
+      {/* Main Content Area (Fixed 100vh, Column) */}
+      <div style={{ flex: 1, display: 'flex', flexDirection: 'column', height: '100vh', minWidth: 0, overflow: 'hidden' }}>
+        {/* BidSphere AI Top Header (Pinned 60px) */}
         <TenderHeader
           user={user}
           onLogout={handleLogout}
           onToggleSidebar={() => setSidebarCollapsed(!sidebarCollapsed)}
           compareCount={comparedTenderIds.size}
           onOpenCompare={handleOpenCompareModal}
-          onOpenAddTender={() => setShowAddTenderModal(true)}
-          onOpenVault={() => setShowVaultModal(true)}
+          onOpenAddTender={() => user ? setShowAddTenderModal(true) : handleRequireLogin(null, 'company_user')}
+          onOpenVault={() => user ? setShowVaultModal(true) : handleRequireLogin(null, 'company_user')}
           onOpenAIAssistant={() => handleOpenAskAI(null)}
+          onOpenLogin={() => { setAuthMessage(''); setAuthInitialRole('viewer'); setShowAuthModal(true); }}
           onShowToast={showToast}
         />
 
-        {/* View Switcher with Strict RBAC Route Guard */}
-        <main style={{ flex: 1, overflowY: 'auto' }}>
+        {/* View Switcher with Strict RBAC Route Guard & Independent Scrolling */}
+        <main className="main-scroll-container" style={{ flex: 1, overflowY: 'auto', overflowX: 'hidden', height: 'calc(100vh - 60px)' }}>
           {!checkTabPermission(currentTab, user?.role) ? (
             <AccessDenied
               user={user}
@@ -579,16 +636,17 @@ export default function App() {
           eligibilityEvaluation={tenderDetailsData?.eligibilityEvaluation}
           isSaved={savedTenderIds.has(selectedTender.id)}
           onClose={() => { setSelectedTender(null); setTenderDetailsData(null); }}
-          onCheckEligibility={handleCheckEligibility}
+          onCheckEligibility={user ? handleCheckEligibility : () => handleRequireLogin(selectedTender, 'company_user', 'Please log in as Company / Bidder to check eligibility with company profile.')}
           onViewRecommendation={handleViewRecommendation}
-          onToggleSave={handleToggleSave}
+          onToggleSave={user ? handleToggleSave : () => handleRequireLogin(selectedTender, 'company_user', 'Please log in to save tenders to your shortlist.')}
           onSelectSimilar={handleOpenDetailsById}
-          onOpenProposal={(t) => setProposalTender(t)}
-          onOpenWinProbability={(t) => setWinTender(t)}
-          onOpenBOQ={(t) => setBOQTender(t)}
-          onSubmitBid={(t) => setBidModalTender(t)}
+          onOpenProposal={(t) => user ? setProposalTender(t) : handleRequireLogin(t, 'company_user', 'Please log in to generate AI bid proposals.')}
+          onOpenWinProbability={(t) => user ? setWinTender(t) : handleRequireLogin(t, 'company_user', 'Please log in to calculate Win Probability.')}
+          onOpenBOQ={(t) => user ? setBOQTender(t) : handleRequireLogin(t, 'company_user', 'Please log in to use the BOQ Estimator.')}
+          onSubmitBid={(t) => user ? setBidModalTender(t) : handleRequireLogin(t, 'company_user', 'Please log in as Company / Bidder to apply and submit sealed bids.')}
           onOpenAskAI={handleOpenAskAI}
-          userRole={user.role}
+          onLoginRequired={(t) => handleRequireLogin(t, 'company_user', `Please log in to apply for tender ${t?.tender_reference_no || ''}.`)}
+          userRole={user?.role || 'viewer'}
         />
       )}
 
