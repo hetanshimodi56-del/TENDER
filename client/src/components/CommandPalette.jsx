@@ -129,6 +129,7 @@ export default function CommandPalette({
       }}
     >
       <div 
+        className="modal-spring"
         style={{
           width: '100%',
           maxWidth: 620,

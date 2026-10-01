@@ -29,6 +29,30 @@ import { formatINR } from '../components/TenderCard';
 import { api } from '../services/api';
 import { downloadTenderRFP } from '../utils/downloadRFP';
 
+// Interactive Animated Number Counter for Metrics
+function CountUpNumber({ end, duration = 900 }) {
+  const [count, setCount] = useState(0);
+  useEffect(() => {
+    let start = 0;
+    const target = Number(end) || 0;
+    if (target === 0) { setCount(0); return; }
+    const stepTime = 20;
+    const steps = duration / stepTime;
+    const increment = target / steps;
+    const timer = setInterval(() => {
+      start += increment;
+      if (start >= target) {
+        setCount(target);
+        clearInterval(timer);
+      } else {
+        setCount(Math.floor(start));
+      }
+    }, stepTime);
+    return () => clearInterval(timer);
+  }, [end, duration]);
+  return <span>{count.toLocaleString('en-IN')}</span>;
+}
+
 export default function TendersListView({
   onViewDetails,
   onCheckEligibility,
@@ -277,7 +301,7 @@ export default function TendersListView({
         >
           <div style={{ fontSize: '0.74rem', color: '#64748b', fontWeight: 600 }}>Active Market Bids</div>
           <div style={{ fontSize: '1.4rem', fontWeight: 800, color: '#0f172a', marginTop: 2 }}>
-            874 <span style={{ fontSize: '0.72rem', fontWeight: 500, color: '#64748b' }}>Tenders</span>
+            <CountUpNumber end={874} /> <span style={{ fontSize: '0.72rem', fontWeight: 500, color: '#64748b' }}>Tenders</span>
           </div>
           <div style={{ fontSize: '0.72rem', color: '#4f46e5', fontWeight: 600, marginTop: 4 }}>
             ₹2,450 Cr Total Value →
@@ -300,7 +324,7 @@ export default function TendersListView({
         >
           <div style={{ fontSize: '0.74rem', color: '#64748b', fontWeight: 600 }}>High AI Fit (80%+)</div>
           <div style={{ fontSize: '1.4rem', fontWeight: 800, color: '#059669', marginTop: 2 }}>
-            60 <span style={{ fontSize: '0.72rem', fontWeight: 500, color: '#64748b' }}>Matches</span>
+            <CountUpNumber end={60} /> <span style={{ fontSize: '0.72rem', fontWeight: 500, color: '#64748b' }}>Matches</span>
           </div>
           <div style={{ fontSize: '0.72rem', color: '#059669', fontWeight: 600, marginTop: 4 }}>
             Highest Win Probability →
@@ -323,7 +347,7 @@ export default function TendersListView({
         >
           <div style={{ fontSize: '0.74rem', color: '#64748b', fontWeight: 600 }}>Urgent Submissions</div>
           <div style={{ fontSize: '1.4rem', fontWeight: 800, color: '#c2410c', marginTop: 2 }}>
-            2 <span style={{ fontSize: '0.72rem', fontWeight: 500, color: '#64748b' }}>Closing &lt; 48h</span>
+            <CountUpNumber end={2} /> <span style={{ fontSize: '0.72rem', fontWeight: 500, color: '#64748b' }}>Closing &lt; 48h</span>
           </div>
           <div style={{ fontSize: '0.72rem', color: '#ea580c', fontWeight: 600, marginTop: 4 }}>
             Action Required Now →
@@ -346,7 +370,7 @@ export default function TendersListView({
         >
           <div style={{ fontSize: '0.74rem', color: '#64748b', fontWeight: 600 }}>Interested Shortlist</div>
           <div style={{ fontSize: '1.4rem', fontWeight: 800, color: '#db2777', marginTop: 2 }}>
-            {savedTenderIds.size + 3} <span style={{ fontSize: '0.72rem', fontWeight: 500, color: '#64748b' }}>Bids</span>
+            <CountUpNumber end={savedTenderIds.size + 3} /> <span style={{ fontSize: '0.72rem', fontWeight: 500, color: '#64748b' }}>Bids</span>
           </div>
           <div style={{ fontSize: '0.72rem', color: '#db2777', fontWeight: 600, marginTop: 4 }}>
             Proposal In Preparation →
@@ -720,15 +744,15 @@ export default function TendersListView({
             return (
               <div
                 key={tender.id}
-                className="saas-card card-interactive"
+                className="saas-card card-interactive card-stagger-in"
                 style={{
                   padding: '20px 24px',
                   display: 'grid',
                   gridTemplateColumns: '110px 1fr 220px',
                   gap: 20,
                   alignItems: 'center',
-                  transition: 'all 0.2s ease',
-                  borderLeft: matchScore >= 80 ? '4px solid #10b981' : '4px solid #6366f1'
+                  borderLeft: matchScore >= 80 ? '4px solid #10b981' : '4px solid #6366f1',
+                  animationDelay: `${Math.min(index * 0.05, 0.4)}s`
                 }}
               >
                 {/* 1. Left Column: AI Match Score Gauge */}
