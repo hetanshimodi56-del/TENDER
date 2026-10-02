@@ -199,7 +199,17 @@ export default function MyTenders({
         gap: 14,
         marginBottom: 20
       }}>
-        <div className="saas-card" style={{ padding: '14px 18px' }}>
+        <div 
+          className="saas-card" 
+          onClick={() => setActiveTab('all')}
+          style={{ 
+            padding: '14px 18px', 
+            cursor: 'pointer',
+            borderTop: activeTab === 'all' ? '3px solid #00796b' : '1px solid var(--border-card)',
+            background: activeTab === 'all' ? 'rgba(0, 121, 107, 0.05)' : undefined
+          }}
+          title="Filter all pipeline items"
+        >
           <div style={{ fontSize: '0.7rem', color: '#64748b', fontWeight: 700, textTransform: 'uppercase' }}>
             Total Pipeline
           </div>
@@ -211,7 +221,17 @@ export default function MyTenders({
           </div>
         </div>
 
-        <div className="saas-card" style={{ padding: '14px 18px' }}>
+        <div 
+          className="saas-card" 
+          onClick={() => setActiveTab('preparing')}
+          style={{ 
+            padding: '14px 18px', 
+            cursor: 'pointer',
+            borderTop: activeTab === 'preparing' ? '3px solid #0284c7' : '1px solid var(--border-card)',
+            background: activeTab === 'preparing' ? 'rgba(2, 132, 199, 0.05)' : undefined
+          }}
+          title="Filter tenders in preparation"
+        >
           <div style={{ fontSize: '0.7rem', color: '#0284c7', fontWeight: 700, textTransform: 'uppercase' }}>
             In Preparation
           </div>
@@ -223,7 +243,17 @@ export default function MyTenders({
           </div>
         </div>
 
-        <div className="saas-card" style={{ padding: '14px 18px' }}>
+        <div 
+          className="saas-card" 
+          onClick={() => setActiveTab('submitted')}
+          style={{ 
+            padding: '14px 18px', 
+            cursor: 'pointer',
+            borderTop: activeTab === 'submitted' ? '3px solid #d97706' : '1px solid var(--border-card)',
+            background: activeTab === 'submitted' ? 'rgba(217, 119, 6, 0.05)' : undefined
+          }}
+          title="Filter submitted bids"
+        >
           <div style={{ fontSize: '0.7rem', color: '#d97706', fontWeight: 700, textTransform: 'uppercase' }}>
             Bids Submitted
           </div>
@@ -235,7 +265,17 @@ export default function MyTenders({
           </div>
         </div>
 
-        <div className="saas-card" style={{ padding: '14px 18px' }}>
+        <div 
+          className="saas-card" 
+          onClick={() => setActiveTab('awarded')}
+          style={{ 
+            padding: '14px 18px', 
+            cursor: 'pointer',
+            borderTop: activeTab === 'awarded' ? '3px solid #16a34a' : '1px solid var(--border-card)',
+            background: activeTab === 'awarded' ? 'rgba(22, 163, 74, 0.05)' : undefined
+          }}
+          title="Filter won contracts"
+        >
           <div style={{ fontSize: '0.7rem', color: '#16a34a', fontWeight: 700, textTransform: 'uppercase' }}>
             Contracts Won
           </div>
@@ -247,7 +287,17 @@ export default function MyTenders({
           </div>
         </div>
 
-        <div className="saas-card" style={{ padding: '14px 18px' }}>
+        <div 
+          className="saas-card" 
+          onClick={() => setActiveTab('my_bids')}
+          style={{ 
+            padding: '14px 18px', 
+            cursor: 'pointer',
+            borderTop: activeTab === 'my_bids' ? '3px solid #4f46e5' : '1px solid var(--border-card)',
+            background: activeTab === 'my_bids' ? 'rgba(79, 70, 229, 0.05)' : undefined
+          }}
+          title="View official bid proposals"
+        >
           <div style={{ fontSize: '0.7rem', color: '#4f46e5', fontWeight: 700, textTransform: 'uppercase' }}>
             Est. Pipeline Value
           </div>
