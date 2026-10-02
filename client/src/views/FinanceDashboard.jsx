@@ -64,47 +64,138 @@ export default function FinanceDashboard({
     }
   };
 
+  // Multi-Period Configs for TIME HORIZON
+  const PERIOD_CONFIGS = {
+    today: {
+      label: 'Today',
+      scale: 0.05,
+      revenueScale: 0.04,
+      chartTitle: "Today's Real-Time Contract Inflows & Realized Receipts",
+      growthBadge: "+4.8% vs Yesterday",
+      chartLabels: ['9 AM', '11 AM', '1 PM', '3 PM', '5 PM', '7 PM', 'Current'],
+      actualPoints: '0,140 70,125 140,105 210,85 280,65 350,45 420,35 500,25',
+      actualPolygon: '0,150 0,140 70,125 140,105 210,85 280,65 350,45 420,35 500,25 500,150',
+      expectedPoints: '0,135 70,115 140,95 210,75 280,55 350,40 420,30 500,18',
+      dataPoints: [[70,125], [140,105], [210,85], [280,65], [350,45], [420,35], [500,25]],
+      periodLabel: 'Today'
+    },
+    week: {
+      label: 'This Week',
+      scale: 0.25,
+      revenueScale: 0.22,
+      chartTitle: "This Week's Daily Cash Collection & Inflow Velocity",
+      growthBadge: "+12.4% vs Last Week",
+      chartLabels: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'],
+      actualPoints: '0,135 70,118 140,100 210,78 280,58 350,42 420,30 500,18',
+      actualPolygon: '0,150 0,135 70,118 140,100 210,78 280,58 350,42 420,30 500,18 500,150',
+      expectedPoints: '0,130 70,110 140,90 210,70 280,50 350,38 420,25 500,15',
+      dataPoints: [[70,118], [140,100], [210,78], [280,58], [350,42], [420,30], [500,18]],
+      periodLabel: 'This Week'
+    },
+    month: {
+      label: 'This Month',
+      scale: 1.0,
+      revenueScale: 1.0,
+      chartTitle: 'Monthly Revenue Trend & Contract Inflows',
+      growthBadge: '+24.5% YoY Growth',
+      chartLabels: ['Week 1', 'Week 2', 'Week 3', 'Week 4', 'Projection'],
+      actualPoints: '0,140 125,115 250,85 375,45 500,15',
+      actualPolygon: '0,150 0,140 125,115 250,85 375,45 500,15 500,150',
+      expectedPoints: '0,130 125,100 250,70 375,35 500,10',
+      dataPoints: [[125,115], [250,85], [375,45], [500,15]],
+      periodLabel: 'This Month'
+    },
+    quarter: {
+      label: 'This Quarter',
+      scale: 2.8,
+      revenueScale: 2.6,
+      chartTitle: 'Quarterly Trajectory & Cumulative Revenue Inflows',
+      growthBadge: '+31.8% vs Previous Quarter',
+      chartLabels: ['Month 1 (Q3)', 'Month 2 (Q3)', 'Month 3 (Q3)'],
+      actualPoints: '0,135 160,95 330,55 500,20',
+      actualPolygon: '0,150 0,135 160,95 330,55 500,20 500,150',
+      expectedPoints: '0,125 160,85 330,45 500,15',
+      dataPoints: [[160,95], [330,55], [500,20]],
+      periodLabel: 'This Quarter'
+    },
+    year: {
+      label: 'This Year',
+      scale: 8.5,
+      revenueScale: 8.0,
+      chartTitle: 'Full Financial Year Revenue Performance (FY 2026-27)',
+      growthBadge: '+46.2% Annualized Velocity',
+      chartLabels: ['Q1 FY26', 'Q2 FY26', 'Q3 FY26 (Live)', 'Q4 Projected'],
+      actualPoints: '0,140 125,105 250,70 375,35 500,12',
+      actualPolygon: '0,150 0,140 125,105 250,70 375,35 500,12 500,150',
+      expectedPoints: '0,130 125,95 250,60 375,30 500,10',
+      dataPoints: [[125,105], [250,70], [375,35], [500,12]],
+      periodLabel: 'This Year'
+    }
+  };
+
+  const currentPeriod = PERIOD_CONFIGS[filterPeriod] || PERIOD_CONFIGS.month;
+
   // Connected Calculations (Sales + Finance Data Flow)
   const wonBids = bids.filter(b => b.status === 'awarded' || b.status === 'accepted' || b.status === 'won');
-  const wonContractValue = wonBids.reduce((acc, b) => acc + Number(b.bid_amount || b.tender?.estimated_value || 0), 0) || 48500000;
+  const baseWonContractValue = wonBids.reduce((acc, b) => acc + Number(b.bid_amount || b.tender?.estimated_value || 0), 0) || 4700000;
   
-  // Received payments (approx 65% of won contracts already disbursed)
+  // Real-time scaled values based on active Time Horizon
+  const wonContractValue = Math.round(baseWonContractValue * currentPeriod.scale);
   const receivedPayments = Math.round(wonContractValue * 0.65);
-  // Pending payments (35% milestone pending)
   const pendingPayments = wonContractValue - receivedPayments;
 
   // Total EMD blocked / invested across tenders participated
   const participatedTenders = tenders.slice(0, 7);
-  const totalEMDAmount = participatedTenders.reduce((acc, t) => acc + Number(t.emd_amount || 0), 0) || 43600000;
-  const refundableEMD = Math.round(totalEMDAmount * 0.35); // 35% completed and awaiting release
-  const totalTenderFees = participatedTenders.reduce((acc, t) => acc + Number(t.tender_fee || 0), 0) || 75000;
+  const baseEMDAmount = participatedTenders.reduce((acc, t) => acc + Number(t.emd_amount || 0), 0) || 4360000;
+  const totalEMDAmount = Math.round(baseEMDAmount * (filterPeriod === 'today' ? 0.15 : filterPeriod === 'week' ? 0.35 : currentPeriod.scale));
+  const refundableEMD = Math.round(totalEMDAmount * 0.35);
+  const totalTenderFees = Math.round((participatedTenders.reduce((acc, t) => acc + Number(t.tender_fee || 0), 0) || 75000) * (filterPeriod === 'today' ? 0.1 : filterPeriod === 'week' ? 0.25 : currentPeriod.scale));
 
   const totalRevenue = receivedPayments;
   const expectedRevenue = Math.round(wonContractValue * 1.15);
   const totalExpenses = Math.round(wonContractValue * 0.72) + totalTenderFees;
   const netProfit = totalRevenue - Math.round(totalExpenses * 0.65);
   const profitMarginPercent = totalRevenue > 0 ? Math.round((netProfit / totalRevenue) * 100) : 22;
+  const outstandingOverdue = Math.round(4800000 * (filterPeriod === 'today' ? 0.05 : filterPeriod === 'week' ? 0.2 : currentPeriod.scale));
 
-  // EMD & Fee Records Table Data
+  // Time-filtered EMD & Fee Records Table Data
   const emdRecords = useMemo(() => {
-    return [
-      { id: 'EMD-101', ref: 'TN-2026-001', tender: 'Smart City ITMS Surat', emd: 500000, fee: 5000, date: '12 Sep 2026', refundStatus: 'Refund Pending', payStatus: 'Paid' },
-      { id: 'EMD-102', ref: 'TN-2026-002', tender: 'Metro Rail Substation Phase 2', emd: 1250000, fee: 10000, date: '18 Sep 2026', refundStatus: 'Paid', payStatus: 'Paid' },
-      { id: 'EMD-103', ref: 'TN-2026-003', tender: 'District Hospital ICU Setup', emd: 350000, fee: 3500, date: '21 Sep 2026', refundStatus: 'Pending', payStatus: 'Paid' },
-      { id: 'EMD-104', ref: 'TN-2026-004', tender: 'Solar Rooftop 5MW Infrastructure', emd: 800000, fee: 7500, date: '24 Sep 2026', refundStatus: 'Refunded', payStatus: 'Refunded' },
-      { id: 'EMD-105', ref: 'TN-2026-005', tender: 'State Cloud Data Center AMC', emd: 650000, fee: 5000, date: '26 Sep 2026', refundStatus: 'Non-Refundable', payStatus: 'Paid' }
-    ].filter(r => emdFilterStatus === 'all' || r.refundStatus.toLowerCase().includes(emdFilterStatus.toLowerCase()));
-  }, [emdFilterStatus]);
+    const allRecords = [
+      { id: 'EMD-101', ref: 'TN-2026-001', tender: 'Smart City ITMS Surat', emd: Math.round(500000 * Math.max(0.2, currentPeriod.scale)), fee: 5000, date: filterPeriod === 'today' ? 'Today, 10:15 AM' : filterPeriod === 'week' ? '02 Oct 2026' : '12 Sep 2026', refundStatus: 'Refund Pending', payStatus: 'Paid' },
+      { id: 'EMD-102', ref: 'TN-2026-002', tender: 'Metro Rail Substation Phase 2', emd: Math.round(1250000 * Math.max(0.2, currentPeriod.scale)), fee: 10000, date: filterPeriod === 'today' ? 'Today, 01:40 PM' : filterPeriod === 'week' ? '01 Oct 2026' : '18 Sep 2026', refundStatus: 'Paid', payStatus: 'Paid' },
+      { id: 'EMD-103', ref: 'TN-2026-003', tender: 'District Hospital ICU Setup', emd: Math.round(350000 * Math.max(0.2, currentPeriod.scale)), fee: 3500, date: filterPeriod === 'week' ? '29 Sep 2026' : '21 Sep 2026', refundStatus: 'Pending', payStatus: 'Paid' },
+      { id: 'EMD-104', ref: 'TN-2026-004', tender: 'Solar Rooftop 5MW Infrastructure', emd: Math.round(800000 * Math.max(0.2, currentPeriod.scale)), fee: 7500, date: '24 Sep 2026', refundStatus: 'Refunded', payStatus: 'Refunded' },
+      { id: 'EMD-105', ref: 'TN-2026-005', tender: 'State Cloud Data Center AMC', emd: Math.round(650000 * Math.max(0.2, currentPeriod.scale)), fee: 5000, date: '26 Sep 2026', refundStatus: 'Non-Refundable', payStatus: 'Paid' }
+    ];
 
-  // Payment Tracking Table Data
+    let filtered = allRecords;
+    if (filterPeriod === 'today') {
+      filtered = allRecords.slice(0, 2);
+    } else if (filterPeriod === 'week') {
+      filtered = allRecords.slice(0, 3);
+    }
+
+    return filtered.filter(r => emdFilterStatus === 'all' || r.refundStatus.toLowerCase().includes(emdFilterStatus.toLowerCase()));
+  }, [emdFilterStatus, filterPeriod, currentPeriod.scale]);
+
+  // Time-filtered Payment Tracking Table Data
   const paymentRecords = useMemo(() => {
-    return [
-      { id: 'PAY-8921', tender: 'Smart City ITMS Surveillance', inv: 'INV-2026-041', amount: 14500000, date: '15 Sep 2026', dueDate: '30 Sep 2026', status: 'Paid' },
-      { id: 'PAY-8922', tender: 'Metro Rail Signalling Milestone 1', inv: 'INV-2026-044', amount: 8200000, date: '20 Sep 2026', dueDate: '05 Oct 2026', status: 'Pending' },
-      { id: 'PAY-8923', tender: 'Hospital Oxygen Plant Delivery', inv: 'INV-2026-049', amount: 4800000, date: '22 Sep 2026', dueDate: '25 Sep 2026', status: 'Overdue' },
-      { id: 'PAY-8924', tender: 'Solar PV Module Supply Batch 1', inv: 'INV-2026-052', amount: 6500000, date: '25 Sep 2026', dueDate: '15 Oct 2026', status: 'Processing' }
-    ].filter(p => paymentFilterStatus === 'all' || p.status.toLowerCase() === paymentFilterStatus.toLowerCase());
-  }, [paymentFilterStatus]);
+    const allPayments = [
+      { id: 'PAY-8921', tender: 'Smart City ITMS Surveillance', inv: 'INV-2026-041', amount: Math.round(14500000 * Math.max(0.1, currentPeriod.scale)), date: filterPeriod === 'today' ? 'Today, 11:20 AM' : filterPeriod === 'week' ? '02 Oct 2026' : '15 Sep 2026', dueDate: '30 Oct 2026', status: 'Paid' },
+      { id: 'PAY-8922', tender: 'Metro Rail Signalling Milestone 1', inv: 'INV-2026-044', amount: Math.round(8200000 * Math.max(0.1, currentPeriod.scale)), date: filterPeriod === 'today' ? 'Today, 03:05 PM' : filterPeriod === 'week' ? '01 Oct 2026' : '20 Sep 2026', dueDate: '05 Nov 2026', status: 'Pending' },
+      { id: 'PAY-8923', tender: 'Hospital Oxygen Plant Delivery', inv: 'INV-2026-049', amount: Math.round(4800000 * Math.max(0.1, currentPeriod.scale)), date: '22 Sep 2026', dueDate: '25 Sep 2026', status: 'Overdue' },
+      { id: 'PAY-8924', tender: 'Solar PV Module Supply Batch 1', inv: 'INV-2026-052', amount: Math.round(6500000 * Math.max(0.1, currentPeriod.scale)), date: '25 Sep 2026', dueDate: '15 Oct 2026', status: 'Processing' }
+    ];
+
+    let filtered = allPayments;
+    if (filterPeriod === 'today') {
+      filtered = allPayments.slice(0, 2);
+    } else if (filterPeriod === 'week') {
+      filtered = allPayments.slice(0, 3);
+    }
+
+    return filtered.filter(p => paymentFilterStatus === 'all' || p.status.toLowerCase() === paymentFilterStatus.toLowerCase());
+  }, [paymentFilterStatus, filterPeriod, currentPeriod.scale]);
 
   // Export handlers
   const handleExportCSV = () => {
@@ -341,7 +432,13 @@ export default function FinanceDashboard({
             ].map(tab => (
               <button
                 key={tab.id}
-                onClick={() => setFilterPeriod(tab.id)}
+                onClick={() => {
+                  setFilterPeriod(tab.id);
+                  if (onShowToast) {
+                    const cfg = PERIOD_CONFIGS[tab.id] || PERIOD_CONFIGS.month;
+                    onShowToast(`Time Horizon set to ${cfg.label} (Portfolio: ${formatINR(Math.round(baseWonContractValue * cfg.scale))})`, 'info');
+                  }
+                }}
                 style={{
                   padding: '5px 12px',
                   borderRadius: 6,
@@ -351,7 +448,7 @@ export default function FinanceDashboard({
                   background: filterPeriod === tab.id ? '#00796b' : 'transparent',
                   color: filterPeriod === tab.id ? '#ffffff' : 'var(--text-muted)',
                   cursor: 'pointer',
-                  transition: 'all 0.15s ease'
+                  transition: 'all 0.18s ease'
                 }}
               >
                 {tab.label}
@@ -362,7 +459,10 @@ export default function FinanceDashboard({
 
         <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
           <span style={{ fontSize: '0.78rem', color: 'var(--text-dim)' }}>
-            Total Contract Portfolio: <strong style={{ color: '#00796b' }}>{formatINR(wonContractValue)}</strong>
+            Total Contract Portfolio: <strong style={{ color: '#00796b', transition: 'all 0.3s ease', fontSize: '0.95rem' }}>{formatINR(wonContractValue)}</strong>
+            <span style={{ fontSize: '0.68rem', marginLeft: 6, color: '#059669', background: 'rgba(5, 150, 105, 0.1)', padding: '2px 6px', borderRadius: 4, fontWeight: 700 }}>
+              {currentPeriod.label}
+            </span>
           </span>
           <button
             onClick={loadFinanceData}
@@ -455,15 +555,15 @@ export default function FinanceDashboard({
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 20 }}>
             <div>
               <h3 style={{ fontSize: '1.05rem', fontWeight: 800, color: 'var(--text-main)', margin: '0 0 2px' }}>
-                Monthly Revenue Trend & Contract Inflows
+                {currentPeriod.chartTitle}
               </h3>
               <span style={{ fontSize: '0.78rem', color: 'var(--text-muted)' }}>
-                Comparison between actual disbursements received vs expected contractual billing
+                Comparison between actual disbursements received vs expected contractual billing for {currentPeriod.label}
               </span>
             </div>
 
             <span style={{ fontSize: '0.75rem', fontWeight: 700, color: '#16a34a', background: 'rgba(22, 163, 74, 0.1)', padding: '4px 10px', borderRadius: 999 }}>
-              +24.5% YoY Growth
+              {currentPeriod.growthBadge}
             </span>
           </div>
 
@@ -484,26 +584,22 @@ export default function FinanceDashboard({
               <line x1="0" y1="150" x2="500" y2="150" stroke="var(--border-subtle)" />
 
               {/* Expected projection line */}
-              <polyline points="0,120 70,105 140,90 210,75 280,60 350,45 420,35 500,20" fill="none" stroke="#94a3b8" strokeWidth="2" strokeDasharray="4 3" />
+              <polyline points={currentPeriod.expectedPoints} fill="none" stroke="#94a3b8" strokeWidth="2" strokeDasharray="4 3" />
 
               {/* Actual revenue area */}
-              <polygon points="0,150 0,130 70,115 140,95 210,80 280,50 350,40 420,30 500,15 500,150" fill="url(#finGrad)" />
-              <polyline points="0,130 70,115 140,95 210,80 280,50 350,40 420,30 500,15" fill="none" stroke="#10b981" strokeWidth="3" />
+              <polygon points={currentPeriod.actualPolygon} fill="url(#finGrad)" />
+              <polyline points={currentPeriod.actualPoints} fill="none" stroke="#10b981" strokeWidth="3" />
 
               {/* Data points */}
-              {[[70,115], [140,95], [210,80], [280,50], [350,40], [420,30], [500,15]].map(([x, y], idx) => (
+              {currentPeriod.dataPoints.map(([x, y], idx) => (
                 <circle key={idx} cx={x} cy={y} r="4" fill="#10b981" stroke="#ffffff" strokeWidth="2" />
               ))}
             </svg>
 
             <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.72rem', color: 'var(--text-dim)', marginTop: 8 }}>
-              <span>Apr (₹0.8 Cr)</span>
-              <span>May (₹1.2 Cr)</span>
-              <span>Jun (₹1.9 Cr)</span>
-              <span>Jul (₹2.4 Cr)</span>
-              <span>Aug (₹3.1 Cr)</span>
-              <span>Sep (₹3.8 Cr)</span>
-              <span>Oct (₹4.8 Cr)</span>
+              {currentPeriod.chartLabels.map((lbl, idx) => (
+                <span key={idx}>{lbl}</span>
+              ))}
             </div>
           </div>
 
