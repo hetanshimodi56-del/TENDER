@@ -308,23 +308,18 @@ export default function TenderDiscovery({
         </div>
       ) : (
         <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
-          {tenders.map((tender, index) => (
-            <div 
+          {tenders.map(tender => (
+            <TenderCard
               key={tender.id}
-              className="card-stagger-in"
-              style={{ animationDelay: `${Math.min(index * 0.05, 0.45)}s` }}
-            >
-              <TenderCard
-                tender={tender}
-                onViewDetails={onViewDetails}
-                onCheckEligibility={onCheckEligibility}
-                onToggleSave={onToggleSave}
-                isSaved={savedTenderIds.has(tender.id)}
-                isCompared={comparedIds.has(tender.id)}
-                onToggleCompare={onToggleCompare}
-                userRole={userRole}
-              />
-            </div>
+              tender={tender}
+              onViewDetails={onViewDetails}
+              onCheckEligibility={onCheckEligibility}
+              onToggleSave={onToggleSave}
+              isSaved={savedTenderIds.has(tender.id)}
+              isCompared={comparedIds.has(tender.id)}
+              onToggleCompare={onToggleCompare}
+              userRole={userRole}
+            />
           ))}
         </div>
       )}

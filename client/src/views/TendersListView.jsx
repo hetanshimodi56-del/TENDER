@@ -744,7 +744,7 @@ export default function TendersListView({
             return (
               <div
                 key={tender.id}
-                className={`saas-card card-interactive card-stagger-in ${matchScore >= 85 ? 'border-beam' : ''}`}
+                className="saas-card card-interactive card-stagger-in"
                 style={{
                   padding: '20px 24px',
                   display: 'grid',
