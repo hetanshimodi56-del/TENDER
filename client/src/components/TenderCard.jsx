@@ -58,7 +58,10 @@ export default function TenderCard({
   else if (matchScore >= 60) matchBadgeClass = 'match-score-pill match-score-medium';
 
   return (
-    <div className="glass-card" style={{ padding: '20px 24px', display: 'flex', flexDirection: 'column', gap: 14 }}>
+    <div 
+      className={`glass-card saas-card spotlight-card card-interactive ${matchScore >= 85 ? 'border-beam' : ''}`}
+      style={{ padding: '20px 24px', display: 'flex', flexDirection: 'column', gap: 14 }}
+    >
       {/* Top Header: Reference, Category, Badges & Save Toggle */}
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', gap: 12 }}>
         <div style={{ display: 'flex', flexWrap: 'wrap', alignItems: 'center', gap: 8 }}>

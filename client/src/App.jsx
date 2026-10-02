@@ -277,9 +277,40 @@ export default function App() {
     };
     window.addEventListener('keydown', handleGlobalKeyDown);
 
+    // Global Interactive Spotlight & 3D Tilt Tracker (Linear/Stripe style)
+    const handleGlobalPointerMove = (e) => {
+      const card = e.target.closest('.saas-card, .glass-card, .spotlight-card, .card-interactive');
+      if (!card) return;
+      const rect = card.getBoundingClientRect();
+      const x = e.clientX - rect.left;
+      const y = e.clientY - rect.top;
+      card.style.setProperty('--mouse-x', `${x}px`);
+      card.style.setProperty('--mouse-y', `${y}px`);
+
+      // 3D Tilt Angles
+      const centerX = rect.width / 2;
+      const centerY = rect.height / 2;
+      const rotateX = ((y - centerY) / centerY) * -3.2;
+      const rotateY = ((x - centerX) / centerX) * 3.2;
+      card.style.setProperty('--tilt-x', `${rotateX.toFixed(2)}deg`);
+      card.style.setProperty('--tilt-y', `${rotateY.toFixed(2)}deg`);
+    };
+
+    const handleGlobalPointerOut = (e) => {
+      const card = e.target.closest('.saas-card, .glass-card, .spotlight-card, .card-interactive');
+      if (!card) return;
+      card.style.setProperty('--tilt-x', '0deg');
+      card.style.setProperty('--tilt-y', '0deg');
+    };
+
+    window.addEventListener('pointermove', handleGlobalPointerMove, { passive: true });
+    window.addEventListener('pointerout', handleGlobalPointerOut, { passive: true });
+
     return () => {
       window.removeEventListener('popstate', handlePopState);
       window.removeEventListener('keydown', handleGlobalKeyDown);
+      window.removeEventListener('pointermove', handleGlobalPointerMove);
+      window.removeEventListener('pointerout', handleGlobalPointerOut);
     };
   }, []);
 
@@ -482,7 +513,14 @@ export default function App() {
   }
 
   return (
-    <div style={{ display: 'flex', height: '100vh', width: '100vw', overflow: 'hidden', background: 'var(--bg-gradient)' }}>
+    <div style={{ display: 'flex', height: '100vh', width: '100vw', overflow: 'hidden', background: 'var(--bg-gradient)', position: 'relative' }}>
+      {/* Living Ambient Aurora Backdrop Orbs */}
+      <div className="aurora-backdrop">
+        <div className="aurora-orb aurora-orb-1" />
+        <div className="aurora-orb aurora-orb-2" />
+        <div className="aurora-orb aurora-orb-3" />
+      </div>
+
       {/* BidSphere AI Left Sidebar (Fixed 100vh, Independent Scroll) */}
       <TenderSidebar
         currentTab={currentTab}

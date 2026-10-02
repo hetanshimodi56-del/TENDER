@@ -850,19 +850,22 @@ table tbody tr:hover {
   animation: meshDrift 18s ease-in-out infinite;
 }
 
-/* 2. Cascading Staggered Card Entrance (Motion Primitives Slide-Up) */
+/* 2. Cascading Blur-to-Sharp Staggered Card Entrance (Spring Physics) */
 @keyframes cardSlideUpSpring {
   0% {
     opacity: 0;
-    transform: translateY(32px) scale(0.97);
+    transform: translateY(28px) scale(0.96);
+    filter: blur(8px);
   }
   65% {
     opacity: 1;
-    transform: translateY(-4px) scale(1.004);
+    transform: translateY(-4px) scale(1.008);
+    filter: blur(0px);
   }
   100% {
     opacity: 1;
     transform: translateY(0) scale(1);
+    filter: blur(0px);
   }
 }
 
@@ -870,21 +873,80 @@ table tbody tr:hover {
   animation: cardSlideUpSpring 0.55s cubic-bezier(0.16, 1, 0.3, 1) both;
 }
 
-/* 3. High-Impact Dynamic Card Hover (Interactive Lift & Vivid Glow) */
+/* ==========================================================================
+   3. ULTRA-MODERN SPOTLIGHT & 3D TILT CARDS (LINEAR / STRIPE STYLE)
+   ========================================================================== */
+
+.saas-card,
+.glass-card,
+.spotlight-card,
 .card-interactive {
-  transition: all 0.26s cubic-bezier(0.16, 1, 0.3, 1) !important;
-  will-change: transform, box-shadow, border-color;
+  --mouse-x: 50%;
+  --mouse-y: 50%;
+  --tilt-x: 0deg;
+  --tilt-y: 0deg;
   position: relative;
+  transform-style: preserve-3d;
+  will-change: transform, box-shadow, border-color;
+  transition: transform 0.22s cubic-bezier(0.16, 1, 0.3, 1), 
+              box-shadow 0.28s cubic-bezier(0.16, 1, 0.3, 1), 
+              border-color 0.24s ease !important;
   overflow: hidden;
 }
 
+.saas-card:hover,
+.glass-card:hover,
+.spotlight-card:hover,
 .card-interactive:hover {
-  transform: translateY(-5px) scale(1.006) !important;
-  box-shadow: 0 20px 32px -8px rgba(0, 121, 107, 0.16), 0 10px 18px -6px rgba(15, 23, 42, 0.08) !important;
-  border-color: #00796b !important;
+  transform: perspective(1000px) rotateX(var(--tilt-x, 0deg)) rotateY(var(--tilt-y, 0deg)) translateY(-4px) !important;
+  box-shadow: 0 20px 38px -10px rgba(0, 121, 107, 0.22), 
+              0 8px 18px -4px rgba(15, 23, 42, 0.08),
+              0 0 0 1px rgba(0, 185, 129, 0.25) !important;
+  border-color: rgba(0, 121, 107, 0.55) !important;
 }
 
-/* Interactive Shimmer Sweep on Card Hover */
+/* Flashlight Cursor Spotlight (Follows mouse across any card) */
+.saas-card::before,
+.glass-card::before,
+.spotlight-card::before,
+.card-interactive::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  background: radial-gradient(
+    520px circle at var(--mouse-x, 50%) var(--mouse-y, 50%),
+    rgba(0, 150, 136, 0.16),
+    rgba(99, 102, 241, 0.07) 35%,
+    transparent 65%
+  );
+  opacity: 0;
+  pointer-events: none;
+  z-index: 1;
+  transition: opacity 0.35s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+[data-theme='dark'] .saas-card::before,
+[data-theme='dark'] .glass-card::before,
+[data-theme='dark'] .spotlight-card::before,
+[data-theme='dark'] .card-interactive::before {
+  background: radial-gradient(
+    520px circle at var(--mouse-x, 50%) var(--mouse-y, 50%),
+    rgba(0, 242, 180, 0.22),
+    rgba(129, 140, 248, 0.12) 35%,
+    transparent 65%
+  );
+}
+
+.saas-card:hover::before,
+.glass-card:hover::before,
+.spotlight-card:hover::before,
+.card-interactive:hover::before {
+  opacity: 1;
+}
+
+/* Interactive Shimmer Light Sweep on Hover */
+.saas-card::after,
 .card-interactive::after {
   content: '';
   position: absolute;
@@ -892,25 +954,122 @@ table tbody tr:hover {
   left: -120%;
   width: 70%;
   height: 100%;
-  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.35), transparent);
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.22), transparent);
   transform: skewX(-20deg);
   transition: left 0.75s ease;
   pointer-events: none;
+  z-index: 2;
 }
 
+.saas-card:hover::after,
 .card-interactive:hover::after {
   left: 140%;
 }
 
-/* 4. Radar Live Dot (Active Tenders Indicator) */
+/* 4. Animated Neon Border Beam for Highlights */
+@keyframes borderBeamRotate {
+  0% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+  100% { background-position: 0% 50%; }
+}
+
+.border-beam {
+  position: relative;
+}
+
+.border-beam::after {
+  content: '';
+  position: absolute;
+  inset: -1.5px;
+  border-radius: inherit;
+  padding: 1.5px;
+  background: linear-gradient(90deg, #00897b, #10b981, #6366f1, #00897b);
+  background-size: 300% 300%;
+  animation: borderBeamRotate 5s linear infinite;
+  -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+  -webkit-mask-composite: xor;
+  mask-composite: exclude;
+  pointer-events: none;
+  opacity: 0.85;
+  z-index: 2;
+}
+
+/* 5. Living Ambient Aurora Orbs in Background */
+.aurora-backdrop {
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 0;
+  overflow: hidden;
+}
+
+.aurora-orb {
+  position: absolute;
+  border-radius: 50%;
+  filter: blur(85px);
+  opacity: 0.35;
+  will-change: transform;
+}
+
+[data-theme='dark'] .aurora-orb {
+  opacity: 0.55;
+  filter: blur(100px);
+}
+
+@keyframes orbFloat1 {
+  0% { transform: translate(0, 0) scale(1); }
+  50% { transform: translate(50px, 35px) scale(1.12); }
+  100% { transform: translate(-30px, 60px) scale(0.96); }
+}
+
+@keyframes orbFloat2 {
+  0% { transform: translate(0, 0) scale(1); }
+  50% { transform: translate(-45px, -30px) scale(1.08); }
+  100% { transform: translate(35px, -45px) scale(1.04); }
+}
+
+@keyframes orbFloat3 {
+  0% { transform: translate(0, 0) scale(1.04); }
+  50% { transform: translate(35px, -35px) scale(0.92); }
+  100% { transform: translate(-35px, 20px) scale(1.1); }
+}
+
+.aurora-orb-1 {
+  top: -5%;
+  left: 15%;
+  width: 520px;
+  height: 520px;
+  background: radial-gradient(circle, rgba(0, 150, 136, 0.28), transparent 70%);
+  animation: orbFloat1 22s ease-in-out infinite alternate;
+}
+
+.aurora-orb-2 {
+  top: 40%;
+  right: 5%;
+  width: 560px;
+  height: 560px;
+  background: radial-gradient(circle, rgba(99, 102, 241, 0.22), transparent 70%);
+  animation: orbFloat2 26s ease-in-out infinite alternate;
+}
+
+.aurora-orb-3 {
+  bottom: -5%;
+  left: 30%;
+  width: 480px;
+  height: 480px;
+  background: radial-gradient(circle, rgba(16, 185, 129, 0.24), transparent 70%);
+  animation: orbFloat3 19s ease-in-out infinite alternate;
+}
+
+/* 6. Radar Live Dot (Active Tenders Indicator) */
 @keyframes radarPing {
   0% {
     transform: scale(0.9);
-    box-shadow: 0 0 0 0 rgba(16, 185, 129, 0.8);
+    box-shadow: 0 0 0 0 rgba(16, 185, 129, 0.85);
   }
   70% {
     transform: scale(1.05);
-    box-shadow: 0 0 0 9px rgba(16, 185, 129, 0);
+    box-shadow: 0 0 0 10px rgba(16, 185, 129, 0);
   }
   100% {
     transform: scale(0.9);
@@ -927,27 +1086,63 @@ table tbody tr:hover {
   animation: radarPing 1.8s cubic-bezier(0.25, 0.46, 0.45, 0.94) infinite;
 }
 
-/* 5. Floating AI Assistant Glowing Orbit Halo */
+/* 7. Holographic Dual-Orbit Floating AI Assistant */
+@keyframes aiOuterSpin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+@keyframes aiInnerSpin {
+  0% { transform: rotate(360deg); }
+  100% { transform: rotate(0deg); }
+}
+
 @keyframes auraOrbit {
-  0% {
-    box-shadow: 0 10px 28px rgba(0, 121, 107, 0.45), 0 0 0 0 rgba(16, 185, 129, 0.5);
+  0%, 100% {
+    box-shadow: 0 10px 30px rgba(0, 121, 107, 0.45), 0 0 0 0 rgba(16, 185, 129, 0.5);
     transform: translateY(0);
   }
   50% {
-    box-shadow: 0 16px 36px rgba(0, 121, 107, 0.65), 0 0 24px 6px rgba(16, 185, 129, 0.55);
+    box-shadow: 0 18px 42px rgba(0, 121, 107, 0.7), 0 0 28px 8px rgba(16, 185, 129, 0.6);
     transform: translateY(-4px);
-  }
-  100% {
-    box-shadow: 0 10px 28px rgba(0, 121, 107, 0.45), 0 0 0 0 rgba(16, 185, 129, 0.5);
-    transform: translateY(0);
   }
 }
 
 .floating-ai-aura {
-  animation: auraOrbit 3.2s ease-in-out infinite;
+  animation: auraOrbit 3.4s ease-in-out infinite;
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
 }
 
-/* 6. Skeleton Loading Shimmer */
+.floating-ai-aura:hover {
+  transform: translateY(-6px) scale(1.04) !important;
+  box-shadow: 0 22px 50px rgba(0, 121, 107, 0.8), 0 0 35px rgba(52, 211, 153, 0.75) !important;
+}
+
+.floating-ai-aura:active {
+  transform: translateY(-2px) scale(0.98) !important;
+}
+
+/* AI Equalizer Audio Soundwave bars */
+@keyframes aiEqualizer {
+  0%, 100% { height: 4px; }
+  50% { height: 16px; }
+}
+
+.ai-eq-bar {
+  display: inline-block;
+  width: 2.5px;
+  background: #34d399;
+  border-radius: 2px;
+  animation: aiEqualizer 1.2s ease-in-out infinite;
+}
+
+.ai-eq-bar:nth-child(1) { animation-delay: 0.1s; }
+.ai-eq-bar:nth-child(2) { animation-delay: 0.35s; }
+.ai-eq-bar:nth-child(3) { animation-delay: 0.2s; }
+.ai-eq-bar:nth-child(4) { animation-delay: 0.45s; }
+
+/* 8. Skeleton Loading Shimmer */
 @keyframes skeletonShimmer {
   0% { background-position: -200% 0; }
   100% { background-position: 200% 0; }
@@ -960,7 +1155,7 @@ table tbody tr:hover {
   border-radius: 6px;
 }
 
-/* 7. Haikei-Style Mesh Gradient Hero Banner */
+/* 9. Haikei-Style Mesh Gradient Hero Banner */
 .haikei-mesh-banner {
   background: radial-gradient(at 10% 20%, rgba(0, 121, 107, 0.12) 0px, transparent 50%),
               radial-gradient(at 90% 10%, rgba(99, 102, 241, 0.12) 0px, transparent 50%),
@@ -975,7 +1170,7 @@ table tbody tr:hover {
               #0f172a;
 }
 
-/* 8. Ticking Urgency Badge with Dynamic Flash */
+/* 10. Ticking Urgency Badge with Dynamic Flash */
 @keyframes urgentFlash {
   0%, 100% {
     transform: scale(1);
@@ -1001,7 +1196,7 @@ table tbody tr:hover {
   animation: urgentFlash 1.8s infinite ease-in-out;
 }
 
-/* 9. Spring Bouncy Pop-In for Modals */
+/* 11. Spring Bouncy Pop-In for Modals */
 @keyframes modalSpringPop {
   0% {
     opacity: 0;
@@ -1021,13 +1216,56 @@ table tbody tr:hover {
   animation: modalSpringPop 0.32s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
 }
 
-/* 10. Subtle Tactile Button Press */
-.btn-tactile {
-  transition: transform 0.12s ease, filter 0.12s ease;
+/* 12. Tactile Button & Input Physics */
+.btn {
+  transition: transform 0.18s cubic-bezier(0.16, 1, 0.3, 1), 
+              box-shadow 0.2s cubic-bezier(0.16, 1, 0.3, 1), 
+              background-color 0.2s ease, 
+              border-color 0.2s ease !important;
 }
 
-.btn-tactile:active {
-  transform: scale(0.95) !important;
+.btn:hover {
+  transform: translateY(-1.5px);
+}
+
+.btn:active {
+  transform: scale(0.96) translateY(0px) !important;
+}
+
+/* Primary Button High-End Glow & Sweep */
+.btn-primary {
+  position: relative;
+  overflow: hidden;
+  box-shadow: 0 4px 14px rgba(0, 121, 107, 0.35);
+}
+
+.btn-primary:hover {
+  box-shadow: 0 8px 24px -2px rgba(0, 121, 107, 0.5), 0 0 16px rgba(0, 191, 165, 0.35) !important;
+}
+
+.btn-primary::after {
+  content: '';
+  position: absolute;
+  top: -50%;
+  left: -80%;
+  width: 50%;
+  height: 200%;
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.4), transparent);
+  transform: rotate(25deg);
+  pointer-events: none;
+  transition: left 0.75s ease-in-out;
+}
+
+.btn-primary:hover::after {
+  left: 150%;
+}
+
+/* Interactive Input Focus Glow Ring */
+input:focus, select:focus, textarea:focus {
+  outline: none !important;
+  border-color: #00897b !important;
+  box-shadow: 0 0 0 3px rgba(0, 137, 123, 0.22), 0 2px 8px rgba(0, 137, 123, 0.1) !important;
+  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1) !important;
 }
 
 
