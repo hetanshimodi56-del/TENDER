@@ -55,8 +55,26 @@ app.use('/api', (req, res, next) => {
 });
 
 // Enable CORS with Credentials for frontend & API clients
+const ALLOWED_ORIGINS = [
+  'http://localhost:3000',
+  'http://localhost:5000',
+  'https://tender-pmts.onrender.com',
+  /\.vercel\.app$/,
+  /\.netlify\.app$/
+];
+
 app.use(cors({
-  origin: true,
+  origin: (origin, callback) => {
+    // Allow requests with no origin (mobile apps, Postman, curl)
+    if (!origin) return callback(null, true);
+    const isAllowed = ALLOWED_ORIGINS.some(allowed =>
+      typeof allowed === 'string' ? allowed === origin : allowed.test(origin)
+    );
+    if (isAllowed) return callback(null, true);
+    // Allow any localhost port for development
+    if (/^http:\/\/localhost:\d+$/.test(origin)) return callback(null, true);
+    callback(null, true); // Permissive for academic project
+  },
   credentials: true,
   methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
   allowedHeaders: ['Content-Type', 'Authorization', 'x-session-id']

@@ -5,3 +5,13 @@ server/uploads/
 .env.*
 !.env.example
 npm-debug.log*
+*.log
+
+# Local runtime database - do not commit local seed data
+server/data/database.json
+
+# OS & Editor files
+.DS_Store
+Thumbs.db
+.vscode/
+*.swp
