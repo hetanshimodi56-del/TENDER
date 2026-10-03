@@ -8,7 +8,7 @@ import {
   Bell, 
   User, 
   LogOut, 
-  CheckCircle2, 
+  CircleCheck, 
   AlertTriangle,
   Building,
   BarChart3,
@@ -223,7 +223,7 @@ export default function Navbar({
                       <div style={{ fontSize: '0.85rem', fontWeight: 600, color: '#fff' }}>{r.label}</div>
                       <div style={{ fontSize: '0.7rem', color: 'var(--text-muted)' }}>{r.name}</div>
                     </div>
-                    {user?.role === r.role && <CheckCircle2 size={16} color="#34d399" />}
+                    {user?.role === r.role && <CircleCheck size={16} color="#34d399" />}
                   </div>
                 ))}
               </div>

@@ -3,7 +3,7 @@ import {
   X, 
   TrendingUp, 
   AlertTriangle, 
-  CheckCircle2, 
+  CircleCheck, 
   DollarSign, 
   Scale, 
   Trophy, 

@@ -5,7 +5,7 @@ import {
   DollarSign, 
   FileText, 
   CheckCircle, 
-  XCircle, 
+  CircleX, 
   Clock, 
   AlertTriangle, 
   Sparkles, 
@@ -357,7 +357,7 @@ export default function SalesDashboard({
       delta: '-5.2%',
       positive: true,
       period: 'rejected / L2+',
-      icon: XCircle,
+      icon: CircleX,
       color: '#ef4444',
       bg: 'rgba(239, 68, 68, 0.1)',
       onClick: () => onShowToast && onShowToast(`${lostBidsCount} lost proposals cataloged for post-mortem analysis`, 'info')
@@ -700,7 +700,7 @@ export default function SalesDashboard({
             { stage: '3. Eligibility OK', count: Math.max(5, savedCount), val: Math.round(totalPipelineValue * 0.35), color: '#06b6d4', bg: 'rgba(6, 182, 212, 0.1)' },
             { stage: '4. Bid Preparation', count: 4, val: Math.round(totalPipelineValue * 0.22), color: '#f59e0b', bg: 'rgba(245, 158, 11, 0.1)' },
             { stage: '5. Bid Submitted', count: totalBids || 12, val: Math.round(totalPipelineValue * 0.18), color: '#6366f1', bg: 'rgba(99, 102, 241, 0.1)' },
-            { stage: '6. Under Eval', count: pendingBids.length || 4, val: Math.round(totalPipelineValue * 0.12), color: '#d97706', bg: 'rgba(217, 119, 6, 0.1)' },
+            { stage: '6. Under Eval', count: pendingBidsCount || 4, val: Math.round(totalPipelineValue * 0.12), color: '#d97706', bg: 'rgba(217, 119, 6, 0.1)' },
             { stage: '7. Won Contracts', count: wonBids.length || 5, val: wonContractValue, color: '#16a34a', bg: 'rgba(22, 163, 74, 0.15)' }
           ].map((st, sIdx) => (
             <div
@@ -873,13 +873,13 @@ export default function SalesDashboard({
               <span style={{ display: 'flex', alignItems: 'center', gap: 6, color: '#ef4444', fontWeight: 700 }}>
                 ● Lost / Disqualified
               </span>
-              <strong style={{ color: 'var(--text-main)' }}>{lostBids.length || 3} Bids (25%)</strong>
+              <strong style={{ color: 'var(--text-main)' }}>{lostBidsCount || 3} Bids (25%)</strong>
             </div>
             <div style={{ display: 'flex', justifyContent: 'space-between' }}>
               <span style={{ display: 'flex', alignItems: 'center', gap: 6, color: '#f59e0b', fontWeight: 700 }}>
                 ● Under Evaluation
               </span>
-              <strong style={{ color: 'var(--text-main)' }}>{pendingBids.length || 4} Bids (33%)</strong>
+              <strong style={{ color: 'var(--text-main)' }}>{pendingBidsCount || 4} Bids (33%)</strong>
             </div>
           </div>
         </div>

@@ -7,8 +7,8 @@ import {
   Building2, 
   FileText, 
   UploadCloud, 
-  CheckCircle2, 
-  AlertCircle,
+  CircleCheck, 
+  CircleAlert,
   Sparkles,
   ShieldCheck,
   TrendingUp,
@@ -289,7 +289,7 @@ export default function SubmitBidModal({
               alignItems: 'center',
               gap: 8
             }}>
-              <AlertCircle size={16} />
+              <CircleAlert size={16} />
               <span>{error}</span>
             </div>
           )}

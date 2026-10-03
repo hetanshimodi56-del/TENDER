@@ -17,7 +17,7 @@ import {
   Plus, 
   TrendingUp, 
   FileText,
-  AlertCircle,
+  CircleAlert,
   Calculator
 } from 'lucide-react';
 import { formatINR } from '../components/TenderCard';
@@ -135,7 +135,7 @@ export default function MyTenders({
       case 'awarded':
         return { label: 'Contract Won 🎉', bg: '#dcfce7', color: '#16a34a', icon: Trophy };
       case 'lost':
-        return { label: 'Not Awarded', bg: '#fee2e2', color: '#dc2626', icon: AlertCircle };
+        return { label: 'Not Awarded', bg: '#fee2e2', color: '#dc2626', icon: CircleAlert };
       case 'saved':
       default:
         return { label: 'Shortlisted', bg: '#f1f5f9', color: '#475569', icon: Bookmark };
@@ -773,7 +773,7 @@ export default function MyTenders({
                       alignItems: 'center',
                       gap: 10
                     }}>
-                      <AlertCircle size={20} color="#dc2626" />
+                      <CircleAlert size={20} color="#dc2626" />
                       <div>
                         <div style={{ fontSize: '0.82rem', fontWeight: 800, color: '#991b1b' }}>
                           Official Rejection Remarks from Department Authority:

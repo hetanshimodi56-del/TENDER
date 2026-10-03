@@ -3,7 +3,7 @@ import {
   Building, 
   Sliders, 
   Save, 
-  CheckCircle2, 
+  CircleCheck, 
   ShieldCheck, 
   Award, 
   MapPin, 
@@ -146,7 +146,7 @@ export default function CompanyProfileView({ onProfileUpdated }) {
           gap: 10,
           marginBottom: 24
         }}>
-          <CheckCircle2 size={18} /> {successMsg}
+          <CircleCheck size={18} /> {successMsg}
         </div>
       )}
 

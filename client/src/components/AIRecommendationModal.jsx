@@ -2,7 +2,7 @@ import React from 'react';
 import { 
   X, 
   Sparkles, 
-  CheckCircle2, 
+  CircleCheck, 
   AlertTriangle, 
   TrendingUp, 
   ShieldCheck,
@@ -176,7 +176,7 @@ export default function AIRecommendationModal({ tender, recommendation, onClose 
           {recommendation.reasons?.length > 0 && (
             <div style={{ marginBottom: 20 }}>
               <div style={{ fontSize: '0.82rem', fontWeight: 700, color: '#15803d', textTransform: 'uppercase', letterSpacing: '0.04em', marginBottom: 10, display: 'flex', alignItems: 'center', gap: 6 }}>
-                <CheckCircle2 size={16} /> Recommendation Rationale ({recommendation.reasons.length})
+                <CircleCheck size={16} /> Recommendation Rationale ({recommendation.reasons.length})
               </div>
               <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
                 {recommendation.reasons.map((reason, i) => (

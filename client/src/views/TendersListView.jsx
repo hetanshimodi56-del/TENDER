@@ -16,8 +16,8 @@ import {
   RefreshCw, 
   SlidersHorizontal,
   RotateCcw,
-  CheckCircle2,
-  AlertCircle,
+  CircleCheck,
+  CircleAlert,
   Clock,
   Layers,
   Award,
@@ -953,7 +953,7 @@ export default function TendersListView({
                         justifyContent: 'center'
                       }}
                     >
-                      <CheckCircle2 size={13} /> Check Eligibility
+                      <CircleCheck size={13} /> Check Eligibility
                     </button>
 
                     <div style={{ display: 'flex', gap: 6, width: '100%' }}>

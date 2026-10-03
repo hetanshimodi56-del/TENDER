@@ -8,7 +8,7 @@ import {
   Clock, 
   RotateCcw, 
   CheckCircle, 
-  AlertCircle, 
+  CircleAlert, 
   Download, 
   Filter, 
   Search, 
@@ -24,7 +24,7 @@ import {
   PieChart,
   Layers,
   Building2,
-  HelpCircle
+  CircleHelp
 } from 'lucide-react';
 import { api } from '../services/api';
 import { formatINR } from '../components/TenderCard';
@@ -283,7 +283,7 @@ export default function FinanceDashboard({
       delta: 'Action Req.',
       positive: false,
       period: 'overdue invoices',
-      icon: AlertCircle,
+      icon: CircleAlert,
       color: '#dc2626',
       bg: 'rgba(220, 38, 38, 0.1)'
     },

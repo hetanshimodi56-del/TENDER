@@ -7,17 +7,17 @@ import {
   Building, 
   ArrowRight, 
   Sparkles, 
-  CheckCircle2,
+  CircleCheck,
   Eye,
   EyeOff,
   Crown,
   Building2,
   Briefcase,
-  HelpCircle,
+  CircleHelp,
   KeyRound,
   RotateCcw,
   Check,
-  AlertCircle,
+  CircleAlert,
   X
 } from 'lucide-react';
 import { api } from '../services/api';
@@ -443,7 +443,7 @@ export default function AuthModal({
               alignItems: 'center',
               gap: 8
             }}>
-              <AlertCircle size={16} />
+              <CircleAlert size={16} />
               <span>{message}</span>
             </div>
           )}
@@ -533,7 +533,7 @@ export default function AuthModal({
               alignItems: 'center',
               gap: 8
             }}>
-              <AlertCircle size={16} />
+              <CircleAlert size={16} />
               <span>{error}</span>
             </div>
           )}
@@ -551,7 +551,7 @@ export default function AuthModal({
               alignItems: 'center',
               gap: 8
             }}>
-              <CheckCircle2 size={16} />
+              <CircleCheck size={16} />
               <span>{successMsg}</span>
             </div>
           )}
@@ -725,7 +725,7 @@ export default function AuthModal({
                     cursor: 'pointer'
                   }}
                 >
-                  <HelpCircle size={13} color="#38bdf8" />
+                  <CircleHelp size={13} color="#38bdf8" />
                   <span>Help / Support</span>
                 </button>
               </div>
@@ -959,7 +959,7 @@ export default function AuthModal({
           }}>
             <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 16 }}>
               <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
-                <HelpCircle size={22} color="#38bdf8" />
+                <CircleHelp size={22} color="#38bdf8" />
                 <h3 style={{ margin: 0, fontSize: '1.15rem', color: '#ffffff', fontWeight: 700 }}>
                   TenderHub Help & Support Desk
                 </h3>

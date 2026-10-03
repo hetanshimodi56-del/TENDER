@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { X, CreditCard, IndianRupee, ShieldCheck, Clock, CheckCircle2, Download } from 'lucide-react';
+import { X, CreditCard, IndianRupee, ShieldCheck, Clock, CircleCheck, Download } from 'lucide-react';
 import { formatINR } from './TenderCard';
 
 export default function FinanceModal({ onClose }) {

@@ -11,7 +11,7 @@ import {
   Building2, 
   ShieldCheck, 
   Send, 
-  CheckCircle2, 
+  CircleCheck, 
   SlidersHorizontal 
 } from 'lucide-react';
 import { api } from '../services/api';

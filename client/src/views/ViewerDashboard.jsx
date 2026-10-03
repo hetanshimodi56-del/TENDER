@@ -12,11 +12,11 @@ import {
   Info,
   Lock,
   Eye,
-  CheckCircle2,
+  CircleCheck,
   Tag,
   Sparkles,
   Bot,
-  HelpCircle,
+  CircleHelp,
   ArrowRight,
   Zap,
   Target,
@@ -231,7 +231,7 @@ export default function ViewerDashboard({ onViewDetails, onShowToast, onOpenAskA
           <div style={{ fontSize: '0.72rem', fontWeight: 700, color: '#64748b', textTransform: 'uppercase' }}>Published Tenders</div>
           <div style={{ fontSize: '1.6rem', fontWeight: 800, color: '#0f172a', marginTop: 4 }}>{tenders.length}</div>
           <div style={{ fontSize: '0.72rem', color: '#16a34a', marginTop: 4, display: 'flex', alignItems: 'center', gap: 4 }}>
-            <CheckCircle2 size={12} /> 100% Verified Open Competition
+            <CircleCheck size={12} /> 100% Verified Open Competition
           </div>
         </div>
 
@@ -653,7 +653,7 @@ export default function ViewerDashboard({ onViewDetails, onShowToast, onOpenAskA
           <div style={{ padding: '16px', borderRadius: 12, border: '1px solid var(--border-subtle, #f1f5f9)' }}>
             <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 10 }}>
               <div style={{ padding: 8, borderRadius: 8, background: '#ecfdf5', color: '#059669' }}>
-                <CheckCircle2 size={18} />
+                <CircleCheck size={18} />
               </div>
               <h4 style={{ margin: 0, fontSize: '0.95rem', fontWeight: 700, color: 'var(--text-main, #0f172a)' }}>
                 5-Point Eligibility Engine
@@ -681,7 +681,7 @@ export default function ViewerDashboard({ onViewDetails, onShowToast, onOpenAskA
             fontWeight: 700,
             marginBottom: 8
           }}>
-            <HelpCircle size={13} /> FREQUENTLY ASKED QUESTIONS
+            <CircleHelp size={13} /> FREQUENTLY ASKED QUESTIONS
           </div>
           <h2 style={{ fontSize: '1.6rem', fontWeight: 800, color: 'var(--text-main, #0f172a)', margin: 0 }}>
             Got Questions? We Have Answers.

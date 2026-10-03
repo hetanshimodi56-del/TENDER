@@ -4,8 +4,8 @@ import {
   FileCheck, 
   Clock, 
   Building2, 
-  CheckCircle2, 
-  AlertCircle, 
+  CircleCheck, 
+  CircleAlert, 
   ChevronRight, 
   ChevronLeft,
   Upload,
@@ -25,7 +25,7 @@ import {
   Trash2,
   Download,
   Check,
-  XCircle,
+  CircleX,
   AlertTriangle,
   FileText
 } from 'lucide-react';
@@ -671,7 +671,7 @@ export default function AuthorityPortal({ user, initialTab = 'dashboard', onView
           {publishSuccess ? (
             <div style={{ textAlign: 'center', padding: '40px 20px' }}>
               <div style={{ width: 64, height: 64, borderRadius: '50%', background: '#dcfce7', display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 16px', border: '1px solid #86efac' }}>
-                <CheckCircle2 size={36} color="#16a34a" />
+                <CircleCheck size={36} color="#16a34a" />
               </div>
               <h2 style={{ fontSize: '1.4rem', fontWeight: 800, color: '#0f172a', marginBottom: 8 }}>
                 Official Tender Published Successfully!
@@ -1267,7 +1267,7 @@ export default function AuthorityPortal({ user, initialTab = 'dashboard', onView
                           className="btn btn-sm btn-success"
                           onClick={() => handleEvaluateBid(b.id, 'awarded', '', 'Contract Awarded to L1 Qualified Contractor')}
                         >
-                          <CheckCircle2 size={14} /> Award Contract
+                          <CircleCheck size={14} /> Award Contract
                         </button>
                       )}
 
@@ -1279,7 +1279,7 @@ export default function AuthorityPortal({ user, initialTab = 'dashboard', onView
                             setRejectionReason('');
                           }}
                         >
-                          <XCircle size={14} /> Reject Bid
+                          <CircleX size={14} /> Reject Bid
                         </button>
                       )}
                     </div>

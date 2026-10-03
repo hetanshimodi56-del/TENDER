@@ -5,8 +5,8 @@ import {
   Building2, 
   FileSpreadsheet, 
   ShieldAlert, 
-  CheckCircle2, 
-  XCircle, 
+  CircleCheck, 
+  CircleX, 
   Upload, 
   Activity, 
   AlertTriangle,
@@ -1002,7 +1002,7 @@ export default function AdminDashboard({ user, initialTab = 'overview', onViewDe
                 alignItems: 'center',
                 gap: 8
               }}>
-                <CheckCircle2 size={16} color="#059669" />
+                <CircleCheck size={16} color="#059669" />
                 <span>
                   <strong>Success:</strong> Document processed and securely indexed into the AI RAG Knowledge Base. The AI Tender Assistant can now cite this document.
                 </span>

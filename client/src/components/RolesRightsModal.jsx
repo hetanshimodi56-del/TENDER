@@ -1,5 +1,5 @@
 import React from 'react';
-import { X, Users2, ShieldCheck, Check, Ban, Lock } from 'lucide-react';
+import { X, Users, ShieldCheck, Check, Ban, Lock } from 'lucide-react';
 
 export default function RolesRightsModal({ onClose }) {
   const permissions = [
@@ -40,7 +40,7 @@ export default function RolesRightsModal({ onClose }) {
               alignItems: 'center',
               justifyContent: 'center'
             }}>
-              <Users2 size={20} />
+              <Users size={20} />
             </div>
             <div>
               <h2 style={{ fontSize: '1.25rem', color: '#0f172a' }}>Role-Based Access Control (RBAC) Matrix</h2>

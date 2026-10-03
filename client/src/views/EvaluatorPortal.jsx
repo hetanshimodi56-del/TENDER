@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { 
   Scale, 
-  CheckCircle2, 
+  CircleCheck, 
   Clock, 
   Building2, 
   Award, 

@@ -3,7 +3,7 @@ import {
   X, 
   FileText, 
   UploadCloud, 
-  CheckCircle2, 
+  CircleCheck, 
   AlertTriangle, 
   Clock, 
   ShieldCheck, 
@@ -338,7 +338,7 @@ export default function DocumentVaultModal({ onClose, onShowToast }) {
               </div>
               <div>
                 <div style={{ fontWeight: 700, color: '#14532d', fontSize: '0.9rem', display: 'flex', alignItems: 'center', gap: 6 }}>
-                  <CheckCircle2 size={16} color="#16a34a" /> {scanResult.verdict}
+                  <CircleCheck size={16} color="#16a34a" /> {scanResult.verdict}
                 </div>
                 <div style={{ fontSize: '0.78rem', color: '#166534', marginTop: 2 }}>
                   {scanResult.recommendation}
@@ -560,7 +560,7 @@ export default function DocumentVaultModal({ onClose, onShowToast }) {
                       {doc.status === 'expiring' ? (
                         <><AlertTriangle size={11} /> Expiring Soon</>
                       ) : (
-                        <><CheckCircle2 size={11} /> Verified ({doc.aiConfidence}%)</>
+                        <><CircleCheck size={11} /> Verified ({doc.aiConfidence}%)</>
                       )}
                     </span>
                     <span style={{

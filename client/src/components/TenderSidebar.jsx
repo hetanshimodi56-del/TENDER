@@ -6,7 +6,7 @@ import {
   BarChart2, 
   FolderKanban, 
   ListTodo, 
-  Users2, 
+  Users, 
   Settings, 
   CreditCard,
   Sparkles, 
@@ -59,7 +59,7 @@ export default function TenderSidebar({
     if (role === 'super_admin') {
       return [
         { id: 'admin', label: 'Admin Overview', icon: Crown },
-        { id: 'admin_users', label: t('users') || 'Users', icon: Users2 },
+        { id: 'admin_users', label: t('users') || 'Users', icon: Users },
         { id: 'admin_companies', label: t('companies') || 'Companies', icon: Building2 },
         { id: 'admin_authorities', label: t('authorities') || 'Authorities', icon: UserCheck },
         { id: 'admin_tenders', label: t('tenders') || 'Tenders', icon: FileText },
@@ -99,7 +99,7 @@ export default function TenderSidebar({
       { id: 'mis_reports', label: 'MIS & Reports', icon: FileSpreadsheet, action: onOpenMIS },
       { id: 'manage_files', label: 'Manage Files', icon: FolderKanban, hasChevron: true, action: onOpenFiles },
       { id: 'tasks', label: 'Tasks', icon: ListTodo, action: () => setCurrentTab('tasks') },
-      { id: 'roles_rights', label: 'Roles & Rights', icon: Users2, hasChevron: true, action: onOpenRoles },
+      { id: 'roles_rights', label: 'Roles & Rights', icon: Users, hasChevron: true, action: onOpenRoles },
       { id: 'configuration', label: 'Configuration', icon: Settings, hasChevron: true, action: () => setCurrentTab('profile') },
       { id: 'finance_manage', label: 'Finance Manage', icon: IndianRupee, hasChevron: true, action: onOpenFinance }
     ];

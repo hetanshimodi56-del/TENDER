@@ -1,9 +1,9 @@
 import React, { useState, useEffect } from 'react';
 import { 
   X, 
-  CheckCircle2, 
-  XCircle, 
-  AlertCircle, 
+  CircleCheck, 
+  CircleX, 
+  CircleAlert, 
   ShieldCheck, 
   Sparkles,
   RefreshCw,

@@ -3,7 +3,7 @@ import {
   Calendar as CalendarIcon, 
   Clock, 
   AlertTriangle, 
-  CheckCircle2, 
+  CircleCheck, 
   ChevronRight,
   Bookmark,
   BellRing,

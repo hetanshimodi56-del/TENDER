@@ -1,5 +1,5 @@
 import React from 'react';
-import { X, FolderKanban, Download, FileText, CheckCircle2, FileSpreadsheet, Shield } from 'lucide-react';
+import { X, FolderKanban, Download, FileText, CircleCheck, FileSpreadsheet, Shield } from 'lucide-react';
 
 export default function FileManagerModal({ onClose }) {
   const documents = [

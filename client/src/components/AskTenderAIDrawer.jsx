@@ -6,7 +6,7 @@ import {
   User, 
   FileText, 
   Quote, 
-  HelpCircle, 
+  CircleHelp, 
   ShieldCheck,
   RefreshCw
 } from 'lucide-react';

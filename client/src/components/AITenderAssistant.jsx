@@ -11,7 +11,7 @@ import {
   Trash2, 
   FileText, 
   ShieldCheck, 
-  HelpCircle, 
+  CircleHelp, 
   ChevronRight,
   ExternalLink,
   Info

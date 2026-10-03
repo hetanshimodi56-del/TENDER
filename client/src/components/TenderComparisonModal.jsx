@@ -6,8 +6,8 @@ import {
   Building2, 
   MapPin, 
   Calendar, 
-  CheckCircle2, 
-  XCircle, 
+  CircleCheck, 
+  CircleX, 
   Sparkles,
   TrendingUp,
   AlertTriangle

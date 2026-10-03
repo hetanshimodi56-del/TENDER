@@ -9,9 +9,9 @@ import {
   ShieldCheck, 
   FileText, 
   Sparkles, 
-  CheckCircle2, 
-  AlertCircle,
-  HelpCircle,
+  CircleCheck, 
+  CircleAlert,
+  CircleHelp,
   ChevronRight,
   ChevronLeft,
   Upload
@@ -241,7 +241,7 @@ export default function AddTenderModal({ onClose, onTenderCreated, user, onShowT
             alignItems: 'center',
             gap: 8
           }}>
-            <AlertCircle size={16} />
+            <CircleAlert size={16} />
             <span>{errorMsg}</span>
           </div>
         )}

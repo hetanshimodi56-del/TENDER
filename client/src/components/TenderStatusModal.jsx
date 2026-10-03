@@ -1,17 +1,17 @@
 import React, { useState } from 'react';
 import { 
   X, 
-  CheckCircle2, 
+  CircleCheck, 
   Clock, 
   Send, 
   Scale, 
   Trophy, 
-  XCircle, 
+  CircleX, 
   Bookmark, 
   Calendar, 
   IndianRupee, 
   FileText,
-  AlertCircle,
+  CircleAlert,
   ArrowRight
 } from 'lucide-react';
 import { api } from '../services/api';

@@ -134,6 +134,9 @@ app.get('/api/health', (req, res) => {
 app.get('/', (req, res, next) => {
   const clientDist = path.join(__dirname, '..', '..', 'client', 'dist');
   if (require('fs').existsSync(clientDist)) {
+    res.setHeader('Cache-Control', 'no-cache, no-store, must-revalidate');
+    res.setHeader('Pragma', 'no-cache');
+    res.setHeader('Expires', '0');
     return res.sendFile(path.join(clientDist, 'index.html'));
   }
   res.json({
@@ -214,7 +217,22 @@ function render403Html(res, message, userRole, requiredRole) {
 // Serve Frontend Build if available
 const clientDistPath = path.join(__dirname, '..', '..', 'client', 'dist');
 if (require('fs').existsSync(clientDistPath)) {
-  app.use(express.static(clientDistPath));
+  // Serve hashed JS/CSS assets with long-term cache (they change name on rebuild)
+  app.use('/assets', express.static(path.join(clientDistPath, 'assets'), {
+    maxAge: '7d',
+    immutable: true
+  }));
+
+  // Serve all other static files (favicon, etc.) without cache — index:false so we control index.html headers
+  app.use(express.static(clientDistPath, { maxAge: 0, etag: false, index: false }));
+
+  // Helper: send index.html with NO-CACHE headers so browser always fetches latest
+  const sendIndex = (res) => {
+    res.setHeader('Cache-Control', 'no-cache, no-store, must-revalidate');
+    res.setHeader('Pragma', 'no-cache');
+    res.setHeader('Expires', '0');
+    res.sendFile(path.join(clientDistPath, 'index.html'));
+  };
 
   // Route Protection for Direct URL Navigation: /admin/*
   app.get(['/admin', '/admin/*'], (req, res, next) => {
@@ -226,7 +244,7 @@ if (require('fs').existsSync(clientDistPath)) {
     if (!isAdmin) {
       return render403Html(res, 'Administrator privileges required. Your account does not have access to Admin Management.', user.role, 'Super Admin');
     }
-    res.sendFile(path.join(clientDistPath, 'index.html'));
+    sendIndex(res);
   });
 
   // Convenience redirects for dashboard shortcuts
@@ -244,7 +262,7 @@ if (require('fs').existsSync(clientDistPath)) {
     if (!isVendor) {
       return render403Html(res, 'Vendor/Company privileges required.', user.role, 'Company / Bidder');
     }
-    res.sendFile(path.join(clientDistPath, 'index.html'));
+    sendIndex(res);
   });
 
   // Route Protection for Direct URL Navigation: /authority/*
@@ -257,7 +275,7 @@ if (require('fs').existsSync(clientDistPath)) {
     if (!isAuthority) {
       return render403Html(res, 'Tender Authority privileges required.', user.role, 'Tender Authority');
     }
-    res.sendFile(path.join(clientDistPath, 'index.html'));
+    sendIndex(res);
   });
 
   // Route Protection for Direct URL Navigation: /user/*
@@ -266,14 +284,14 @@ if (require('fs').existsSync(clientDistPath)) {
     if (!user) {
       return res.redirect('/?login=true&redirect=' + encodeURIComponent(req.originalUrl));
     }
-    res.sendFile(path.join(clientDistPath, 'index.html'));
+    sendIndex(res);
   });
 
   app.get('*', (req, res, next) => {
     if (req.path.startsWith('/api') || req.path.startsWith('/uploads')) {
       return next();
     }
-    res.sendFile(path.join(clientDistPath, 'index.html'));
+    sendIndex(res);
   });
 }
 

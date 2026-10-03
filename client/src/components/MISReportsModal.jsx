@@ -1,5 +1,5 @@
 import React from 'react';
-import { X, BarChart3, Download, TrendingUp, PieChart, FileText, CheckCircle2 } from 'lucide-react';
+import { X, BarChart3, Download, TrendingUp, PieChart, FileText, CircleCheck } from 'lucide-react';
 import { formatINR } from './TenderCard';
 
 export default function MISReportsModal({ onClose }) {
