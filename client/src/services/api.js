@@ -1,4 +1,4 @@
-const API_BASE = import.meta.env.VITE_API_BASE || (import.meta.env.DEV ? '/api' : 'https://tender-pmts.onrender.com/api');
+const API_BASE = import.meta.env.VITE_API_BASE || '/api';
 
 function getAuthHeader() {
   const token = localStorage.getItem('etender_token');
