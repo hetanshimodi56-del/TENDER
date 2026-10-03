@@ -9,6 +9,22 @@ dotenv.config();
 const apiRoutes = require('./routes/api');
 const db = require('./db/db');
 
+// Auto-seed database on startup if empty (handles fresh Render.com deploys)
+const autoSeed = () => {
+  try {
+    const users = db.getTable('users');
+    if (!users || users.length === 0) {
+      console.log('📦 Empty database detected — running auto-seed...');
+      require('./db/seed')();
+      console.log('✅ Auto-seed complete. Demo accounts ready.');
+    }
+  } catch (err) {
+    console.error('⚠️  Auto-seed failed:', err.message);
+  }
+};
+autoSeed();
+
+
 const app = express();
 const PORT = process.env.PORT || 5000;
 
