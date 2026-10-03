@@ -120,8 +120,8 @@ export default function TenderDetailsModal({
 
   if (!tender) return null;
 
-  const closingDate = new Date(tender.closing_date);
-  const openingDate = new Date(tender.opening_date);
+  const closingDate = new Date(tender.closing_date || Date.now());
+  const openingDate = new Date(tender.opening_date || Date.now());
   const now = new Date();
   const diffHours = (closingDate.getTime() - now.getTime()) / 3600000;
   const daysLeft = Math.ceil(diffHours / 24);
@@ -276,7 +276,7 @@ export default function TenderDetailsModal({
                 <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: 12, fontSize: '0.84rem' }}>
                   <div style={{ background: 'var(--bg-card)', padding: '10px 12px', borderRadius: 8, border: '1px solid var(--border-subtle)' }}>
                     <div style={{ fontSize: '0.72rem', color: 'var(--text-muted)', fontWeight: 700, textTransform: 'uppercase' }}>Tender Purpose</div>
-                    <div style={{ color: 'var(--text-main)', marginTop: 2 }}>{tender.description ? tender.description.substring(0, 130) + '...' : 'Execution per RFP specifications.'}</div>
+                    <div style={{ color: 'var(--text-main)', marginTop: 2 }}>{(tender.description || \'\').substring(0, 130) + '...' : 'Execution per RFP specifications.'}</div>
                   </div>
                   <div style={{ background: 'var(--bg-card)', padding: '10px 12px', borderRadius: 8, border: '1px solid var(--border-subtle)' }}>
                     <div style={{ fontSize: '0.72rem', color: 'var(--text-muted)', fontWeight: 700, textTransform: 'uppercase' }}>Estimated Value</div>
@@ -315,7 +315,7 @@ export default function TenderDetailsModal({
                   <div>
                     <div style={{ fontSize: '0.72rem', color: '#64748b', fontWeight: 600 }}>PUBLISHED DATE</div>
                     <div style={{ fontSize: '0.88rem', fontWeight: 600, color: '#0f172a' }}>
-                      {new Date(tender.published_date || tender.created_at).toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' })}
+                      {new Date(tender.published_date || tender.created_at || Date.now()).toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' })}
                     </div>
                   </div>
                   <div>

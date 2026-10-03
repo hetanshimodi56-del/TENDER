@@ -36,12 +36,16 @@ export default function TenderCard({
   onToggleCompare,
   userRole = 'company_user'
 }) {
-  const closingDate = new Date(tender.closing_date);
+  const closingDate = tender.closing_date ? new Date(tender.closing_date) : new Date();
   const now = new Date();
-  const diffDays = Math.ceil((closingDate.getTime() - now.getTime()) / 86400000);
+  const diffDays = tender.closing_date && !isNaN(closingDate.getTime()) 
+    ? Math.ceil((closingDate.getTime() - now.getTime()) / 86400000) 
+    : 0;
 
   let urgencyBadge = null;
-  if (diffDays <= 0) {
+  if (!tender.closing_date || isNaN(closingDate.getTime())) {
+    urgencyBadge = <span className="badge badge-gray">No Deadline</span>;
+  } else if (diffDays <= 0) {
     urgencyBadge = <span className="badge badge-gray">Closed</span>;
   } else if (diffDays <= 3) {
     urgencyBadge = <span className="badge badge-danger"><Clock size={12} /> Closes in {diffDays} {diffDays === 1 ? 'day' : 'days'}</span>;
