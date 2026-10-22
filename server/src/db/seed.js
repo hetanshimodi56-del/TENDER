@@ -1173,6 +1173,408 @@ Eligibility: Must possess PESO license and ISO 13485. 24x7 on-site emergency per
 
   auditEntries.forEach(entry => db.insert('audit_logs', entry));
 
+  // ============================================================================
+  // 13. CLIENT DETAILS & SMART TENDER MATCHING - 10 DEMO CLIENT RECORDS
+  // ============================================================================
+
+  // Array of 10 diverse client records from different industries
+  const demoClients = [
+    {
+      userId: 'usr_client_01', userIdFormatted: 'BID003',
+      name: 'Priya Sharma', email: 'priya@greeninfra.in', phone: '+91 9812345001',
+      company: 'GreenInfra Renewable Solutions Pvt Ltd', designation: 'Managing Director',
+      business_type: 'Private Limited', industry: 'Renewable Energy',
+      gstin: '07AABCG1234F1Z1', pan: 'AABCG1234F',
+      address: '45, Sector 62, Electronic City', city: 'Noida', state: 'Uttar Pradesh', pin: '201309',
+      website: 'https://greeninfra.in', description: 'Leading renewable energy company specializing in solar PV, wind energy, and green hydrogen solutions for government and industrial clients.',
+      years: 12, turnover: '₹80-100 Cr', employees: '250-500',
+      services: ['Solar PV Installation', 'Wind Turbine Engineering', 'Green Hydrogen', 'Energy Auditing', 'EPC Contracting'],
+      certifications: ['ISO 9001:2015', 'ISO 14001:2015', 'MNRE Channel Partner', 'ALMM Listed'],
+      sectors: ['Renewable Energy', 'Power & Energy', 'Green Infrastructure']
+    },
+    {
+      userId: 'usr_client_02', userIdFormatted: 'BID004',
+      name: 'Vikram Patel', email: 'vikram@meditechsys.com', phone: '+91 9812345002',
+      company: 'MediTech Healthcare Systems Ltd', designation: 'Chief Executive Officer',
+      business_type: 'Public Limited', industry: 'Healthcare & Medical Equipment',
+      gstin: '24AABCM5678G1Z5', pan: 'AABCM5678G',
+      address: '12, SG Highway, Bodakdev', city: 'Ahmedabad', state: 'Gujarat', pin: '380054',
+      website: 'https://meditechsys.com', description: 'Manufacturer and supplier of advanced medical imaging systems, hospital management solutions, and biomedical equipment with nationwide service network.',
+      years: 15, turnover: '₹150-200 Cr', employees: '500-1000',
+      services: ['MRI Systems', 'CT Scanners', 'Hospital IT Solutions', 'Biomedical Equipment', 'HMIS Implementation'],
+      certifications: ['ISO 13485:2016', 'ISO 9001:2015', 'US FDA 510(k)', 'AERB Type Approval', 'BIS Certified'],
+      sectors: ['Healthcare & Medical Equipment', 'Biomedical & Healthcare', 'Hospital Infrastructure']
+    },
+    {
+      userId: 'usr_client_03', userIdFormatted: 'BID005',
+      name: 'Arjun Reddy', email: 'arjun@skylineconstructions.in', phone: '+91 9812345003',
+      company: 'Skyline Constructions & Engineering Pvt Ltd', designation: 'Director - Projects',
+      business_type: 'Private Limited', industry: 'Civil Works & Construction',
+      gstin: '36AABCS9012H1Z9', pan: 'AABCS9012H',
+      address: '78, Jubilee Hills, Road No. 36', city: 'Hyderabad', state: 'Telangana', pin: '500033',
+      website: 'https://skylineconstructions.in', description: 'Premier infrastructure development company with expertise in highway construction, bridge engineering, smart city infrastructure, and urban development projects.',
+      years: 20, turnover: '₹500-800 Cr', employees: '1000-5000',
+      services: ['Highway Construction', 'Bridge Engineering', 'Urban Infrastructure', 'Smart City Projects', 'Metro Rail'],
+      certifications: ['ISO 9001:2015', 'ISO 14001:2015', 'ISO 45001:2018', 'Class 1 Civil Contractor'],
+      sectors: ['Civil Works & Construction', 'Infrastructure & Highways', 'Urban Development']
+    },
+    {
+      userId: 'usr_client_04', userIdFormatted: 'BID006',
+      name: 'Neha Deshmukh', email: 'neha@cybershieldtech.com', phone: '+91 9812345004',
+      company: 'CyberShield Technologies Pvt Ltd', designation: 'Founder & CEO',
+      business_type: 'Private Limited', industry: 'Cybersecurity & IT Services',
+      gstin: '27AABCC3456J1Z3', pan: 'AABCC3456J',
+      address: '301, Cyber Tower, Baner', city: 'Pune', state: 'Maharashtra', pin: '411045',
+      website: 'https://cybershieldtech.com', description: 'CERT-In empaneled cybersecurity firm offering SOC-as-a-Service, penetration testing, red teaming, cloud security, and compliance consulting for BFSI and government sectors.',
+      years: 8, turnover: '₹25-50 Cr', employees: '100-250',
+      services: ['SOC Operations', 'VAPT Services', 'Red Teaming', 'Cloud Security', 'Compliance Consulting'],
+      certifications: ['CERT-In Empaneled', 'ISO 27001:2022', 'ISO 22301:2019', 'CMMI Level 3'],
+      sectors: ['Information Technology', 'Cybersecurity & Financial IT', 'Cloud & Enterprise Software']
+    },
+    {
+      userId: 'usr_client_05', userIdFormatted: 'BID007',
+      name: 'Sanjay Gupta', email: 'sanjay@bharatedusmart.com', phone: '+91 9812345005',
+      company: 'Bharat EduSmart Solutions Pvt Ltd', designation: 'Managing Partner',
+      business_type: 'LLP', industry: 'Education Technology',
+      gstin: '09AABCB7890K1Z7', pan: 'AABCB7890K',
+      address: '22, Hazratganj', city: 'Lucknow', state: 'Uttar Pradesh', pin: '226001',
+      website: 'https://bharatedusmart.com', description: 'End-to-end education technology provider for interactive classrooms, digital content, learning management systems, and skill development training centers for government schools and universities.',
+      years: 6, turnover: '₹10-25 Cr', employees: '50-100',
+      services: ['Interactive Flat Panels', 'Digital Podiums', 'LMS Development', 'Content Creation', 'Teacher Training'],
+      certifications: ['ISO 9001:2015', 'BIS Safety Certification', 'MSME Registered'],
+      sectors: ['Electronics & Hardware', 'Education Technology', 'Digital Infrastructure']
+    },
+    {
+      userId: 'usr_client_06', userIdFormatted: 'BID008',
+      name: 'Kavitha Nair', email: 'kavitha@aquapuresystems.com', phone: '+91 9812345006',
+      company: 'AquaPure Water Treatment Systems Pvt Ltd', designation: 'Technical Director',
+      business_type: 'Private Limited', industry: 'Water & Environment',
+      gstin: '32AABCA2345L1Z2', pan: 'AABCA2345L',
+      address: '56, Technopark Campus', city: 'Thiruvananthapuram', state: 'Kerala', pin: '695581',
+      website: 'https://aquapuresystems.com', description: 'Specialized in design, installation, and maintenance of water treatment plants, sewage treatment facilities, and environmental management solutions for municipal corporations and industries.',
+      years: 10, turnover: '₹40-60 Cr', employees: '150-250',
+      services: ['Water Treatment Plants', 'STP Installation', 'ETP Solutions', 'Desalination', 'Environmental Consulting'],
+      certifications: ['ISO 9001:2015', 'ISO 14001:2015', 'CPCB Approved', 'MSME Registered'],
+      sectors: ['Water & Environment', 'Municipal Services', 'Environmental Engineering']
+    },
+    {
+      userId: 'usr_client_07', userIdFormatted: 'BID009',
+      name: 'Rohit Agarwal', email: 'rohit@defencetechind.com', phone: '+91 9812345007',
+      company: 'DefenceTech Industries Ltd', designation: 'Vice President - Business Development',
+      business_type: 'Public Limited', industry: 'Defence & Aerospace',
+      gstin: '06AABCD6789M1Z6', pan: 'AABCD6789M',
+      address: '101, Defence Colony, Phase 1', city: 'Chandigarh', state: 'Punjab', pin: '160001',
+      website: 'https://defencetechind.com', description: 'Defence manufacturing company producing radar systems, night vision equipment, communication systems, and UAV components for armed forces and paramilitary organizations.',
+      years: 18, turnover: '₹200-500 Cr', employees: '1000-5000',
+      services: ['Radar Systems', 'Communication Equipment', 'Night Vision Devices', 'UAV Components', 'EW Systems'],
+      certifications: ['ISO 9001:2015', 'AS 9100D', 'DRDO Approved', 'OFB Registered', 'Industrial License'],
+      sectors: ['Defence & Aerospace', 'Electronics & Instrumentation', 'Manufacturing']
+    },
+    {
+      userId: 'usr_client_08', userIdFormatted: 'BID010',
+      name: 'Meera Krishnamurthy', email: 'meera@logisticspro.in', phone: '+91 9812345008',
+      company: 'LogisticsPro Supply Chain Solutions Pvt Ltd', designation: 'Chief Operations Officer',
+      business_type: 'Private Limited', industry: 'Logistics & Supply Chain',
+      gstin: '29AABCL0123N1Z0', pan: 'AABCL0123N',
+      address: '88, Whitefield Tech Park', city: 'Bengaluru', state: 'Karnataka', pin: '560066',
+      website: 'https://logisticspro.in', description: 'Technology-driven logistics company providing warehouse management, fleet tracking, cold chain solutions, and last-mile delivery for government and e-commerce sectors.',
+      years: 9, turnover: '₹60-80 Cr', employees: '250-500',
+      services: ['Warehouse Management', 'Fleet Tracking', 'Cold Chain', 'Last-Mile Delivery', 'Supply Chain Consulting'],
+      certifications: ['ISO 9001:2015', 'ISO 22000:2018', 'FSSAI Licensed', 'MSME Registered'],
+      sectors: ['Logistics & Supply Chain', 'Transportation', 'Warehousing']
+    },
+    {
+      userId: 'usr_client_09', userIdFormatted: 'BID011',
+      name: 'Amit Joshi', email: 'amit@smartagritech.in', phone: '+91 9812345009',
+      company: 'SmartAgriTech Solutions Pvt Ltd', designation: 'Founder',
+      business_type: 'Startup (DPIIT Recognized)', industry: 'Agriculture Technology',
+      gstin: '08AABCS4567P1Z4', pan: 'AABCS4567P',
+      address: '14, Malviya Nagar', city: 'Jaipur', state: 'Rajasthan', pin: '302017',
+      website: 'https://smartagritech.in', description: 'AgriTech startup developing precision farming platforms, IoT-based soil monitoring systems, drone crop analytics, and digital mandi solutions for state agriculture departments.',
+      years: 4, turnover: '₹5-10 Cr', employees: '25-50',
+      services: ['Precision Farming', 'IoT Soil Monitoring', 'Drone Analytics', 'Digital Mandi Platform', 'Farmer Training'],
+      certifications: ['DPIIT Recognized Startup', 'ISO 9001:2015', 'MSME Registered'],
+      sectors: ['Agriculture Technology', 'IoT & Sensors', 'Rural Development']
+    },
+    {
+      userId: 'usr_client_10', userIdFormatted: 'BID012',
+      name: 'Fatima Sheikh', email: 'fatima@urbanplanners.co.in', phone: '+91 9812345010',
+      company: 'Urban Planners & Architects Pvt Ltd', designation: 'Principal Architect',
+      business_type: 'Private Limited', industry: 'Architecture & Urban Planning',
+      gstin: '33AABCU8901Q1Z8', pan: 'AABCU8901Q',
+      address: '45, Anna Salai, Thousand Lights', city: 'Chennai', state: 'Tamil Nadu', pin: '600006',
+      website: 'https://urbanplanners.co.in', description: 'Award-winning architecture and urban planning firm specializing in smart city master planning, green building design, heritage conservation, and municipal infrastructure planning.',
+      years: 14, turnover: '₹30-50 Cr', employees: '100-250',
+      services: ['Smart City Planning', 'Green Building Design', 'Heritage Conservation', 'Urban Infrastructure', 'GIS Mapping'],
+      certifications: ['ISO 9001:2015', 'GRIHA Certified', 'Council of Architecture Registered', 'IGBC Member'],
+      sectors: ['Architecture & Urban Planning', 'Smart Infrastructure', 'Environmental Design']
+    }
+  ];
+
+  // Create client users, profiles, company entries, documents, and activity
+  demoClients.forEach((client, idx) => {
+    // Create user
+    const user = db.insert('users', {
+      id: client.userId,
+      user_id: client.userIdFormatted,
+      name: `${client.name} (${client.company.split(' ').slice(0, 2).join(' ')})`,
+      email: client.email,
+      password_hash: passwordHash,
+      role: 'company_user',
+      role_id: roleCompany.id,
+      department_id: null,
+      phone: client.phone,
+      status: idx === 7 ? 'suspended' : 'active', // One suspended for demo
+      is_active: idx !== 7,
+      organization_id: null,
+      last_login: subDays(now, Math.floor(Math.random() * 10))
+    });
+
+    // Create client profile
+    db.insert('client_profiles', {
+      id: `clp_${idx + 1}`,
+      user_id: client.userId,
+      full_name: client.name,
+      designation: client.designation,
+      company_name: client.company,
+      business_type: client.business_type,
+      industry: client.industry,
+      gstin: client.gstin,
+      pan: client.pan,
+      address: client.address,
+      city: client.city,
+      state: client.state,
+      pin_code: client.pin,
+      website: client.website,
+      description: client.description,
+      years_experience: client.years,
+      annual_turnover: client.turnover,
+      employee_count: client.employees,
+      services_products: client.services,
+      mobile: client.phone,
+      profile_photo: '',
+      verification_status: idx < 6 ? 'approved' : (idx === 6 ? 'pending' : (idx === 7 ? 'suspended' : 'pending')),
+      account_status: idx === 7 ? 'suspended' : 'active',
+      registration_date: subDays(now, 30 + idx * 15)
+    });
+
+    // Create company profile for AI matching
+    db.insert('company_profiles', {
+      id: `cpf_client_${idx + 1}`,
+      user_id: client.userId,
+      company_name: client.company,
+      pan_number: client.pan,
+      gst_number: client.gstin,
+      annual_turnover: parseInt((client.turnover.match(/\d+/) || ['0'])[0]) * 10000000,
+      years_of_experience: client.years,
+      certifications: client.certifications,
+      state: client.state,
+      city: client.city,
+      industry_sectors: client.sectors,
+      core_capabilities: client.services,
+      verified: idx < 6
+    });
+
+    // Create company entry
+    db.insert('companies', {
+      id: `comp_client_${idx + 1}`,
+      user_id: client.userIdFormatted,
+      company_name: client.company,
+      registration_number: `U${Math.floor(10000 + Math.random() * 90000)}${client.state.substring(0, 2).toUpperCase()}20${10 + idx}PTC${Math.floor(100000 + Math.random() * 900000)}`,
+      GST_number: client.gstin,
+      address: `${client.address}, ${client.city}, ${client.state} - ${client.pin}`,
+      experience: `${client.years} Years in ${client.industry}`,
+      verification_status: idx < 6 ? 'approved' : 'pending'
+    });
+
+    // Create user preferences
+    db.insert('user_preferences', {
+      id: `pref_client_${idx + 1}`,
+      user_id: client.userId,
+      categories: client.sectors,
+      locations: [client.state, 'Delhi', 'Maharashtra'],
+      min_value: 10000000,
+      max_value: 1000000000,
+      keywords: client.services.slice(0, 4),
+      max_deadline_days: 60,
+      alert_email_enabled: true,
+      alert_in_app_enabled: true
+    });
+
+    // Create demo documents for each client
+    const docTypes = [
+      { type: 'company_registration', name: 'Company Registration Certificate', expiry: null },
+      { type: 'gst_certificate', name: 'GST Registration Certificate', expiry: addDays(now, 365) },
+      { type: 'pan_document', name: 'PAN Card Copy', expiry: null },
+      { type: 'experience_certificate', name: 'Experience Certificate - ' + client.services[0], expiry: null },
+      { type: 'financial_statement', name: 'Audited Financial Statements FY 2025-26', expiry: null },
+      { type: 'other', name: client.certifications[0] + ' Certificate', expiry: addDays(now, 180) }
+    ];
+
+    docTypes.forEach((docType, dIdx) => {
+      db.insert('client_documents', {
+        id: `cdoc_${idx + 1}_${dIdx + 1}`,
+        user_id: client.userId,
+        document_type: docType.type,
+        document_name: docType.name,
+        file_name: `demo_${docType.type}_${idx + 1}.pdf`,
+        file_path: `/uploads/demo_${docType.type}_${idx + 1}.pdf`,
+        file_size: Math.floor(500000 + Math.random() * 2000000),
+        mime_type: 'application/pdf',
+        expiry_date: docType.expiry,
+        verification_status: dIdx < 3 ? 'verified' : (dIdx === 3 ? 'pending' : 'not_submitted'),
+        uploaded_at: subDays(now, 20 + dIdx),
+        verified_by: dIdx < 3 ? 'usr_admin' : null,
+        verified_at: dIdx < 3 ? subDays(now, 15 + dIdx) : null
+      });
+    });
+
+    // Create demo activity log entries
+    const activities = [
+      { type: 'profile_updated', title: 'Profile Updated', desc: 'Client profile details were updated.', daysAgo: 2 },
+      { type: 'tender_matched', title: 'New Tender Matched', desc: `AI found ${Math.floor(3 + Math.random() * 8)} matching tenders for your profile.`, daysAgo: 1 },
+      { type: 'document_uploaded', title: 'Document Uploaded', desc: `Uploaded ${docTypes[0].name}.`, daysAgo: 5 },
+      { type: 'bid_submitted', title: 'Bid Submitted', desc: `Submitted bid for tender in ${client.industry} category.`, daysAgo: 3 },
+      { type: 'document_verified', title: 'Document Verified', desc: `${docTypes[0].name} verified by admin.`, daysAgo: 4 }
+    ];
+
+    activities.forEach((act, aIdx) => {
+      db.insert('client_activity', {
+        id: `cact_${idx + 1}_${aIdx + 1}`,
+        user_id: client.userId,
+        type: act.type,
+        title: act.title,
+        description: act.desc,
+        icon: act.type === 'profile_updated' ? 'user-edit' : act.type === 'tender_matched' ? 'target' : act.type === 'document_uploaded' ? 'file-up' : act.type === 'bid_submitted' ? 'send' : 'shield-check',
+        created_at: subDays(now, act.daysAgo)
+      });
+    });
+
+    // Create notifications for each client
+    db.insert('notifications', {
+      user_id: client.userIdFormatted,
+      title: 'Welcome to TenderHub',
+      message: `Welcome ${client.name}! Your ${client.company} profile has been created. Complete your profile to start receiving AI tender matches.`,
+      read_status: true,
+      created_at: subDays(now, 25)
+    });
+
+    db.insert('notifications', {
+      user_id: client.userIdFormatted,
+      title: idx < 6 ? 'Profile Verified' : 'Profile Verification Pending',
+      message: idx < 6
+        ? `Your company profile for ${client.company} has been verified by the platform admin.`
+        : `Your company profile is pending verification. Please ensure all required documents are uploaded.`,
+      read_status: idx < 4,
+      created_at: subDays(now, 10)
+    });
+
+    if (idx % 2 === 0) {
+      db.insert('notifications', {
+        user_id: client.userIdFormatted,
+        title: 'New Tender Alert',
+        message: `${Math.floor(2 + Math.random() * 5)} new tenders matching your ${client.industry} profile have been published.`,
+        read_status: false,
+        created_at: subDays(now, 1)
+      });
+    }
+
+    if (idx < 5) {
+      db.insert('notifications', {
+        user_id: client.userIdFormatted,
+        title: 'Tender Deadline Approaching',
+        message: `Reminder: A tender deadline in ${client.state} is approaching in the next 7 days.`,
+        read_status: false,
+        created_at: subDays(now, 2)
+      });
+    }
+  });
+
+  // Also create client profiles for existing demo bidders (BID001 & BID002)
+  db.insert('client_profiles', {
+    id: 'clp_bid001',
+    user_id: 'usr_company',
+    full_name: 'Aarav Mehta',
+    designation: 'Director',
+    company_name: 'TechInfra Smart Systems Pvt Ltd',
+    business_type: 'Private Limited',
+    industry: 'Information Technology',
+    gstin: '24AAACT1234F1Z8',
+    pan: 'AAACT1234F',
+    address: 'Plot 42, Infocity',
+    city: 'Gandhinagar',
+    state: 'Gujarat',
+    pin_code: '382007',
+    website: 'https://techinfra.com',
+    description: 'Smart city solutions, IoT surveillance, cloud ERP, and AI-driven traffic management systems.',
+    years_experience: 8,
+    annual_turnover: '₹50-80 Cr',
+    employee_count: '100-250',
+    services_products: ['Intelligent Traffic Systems', 'AI Video Analytics', 'Cloud ERP Implementation', 'SCADA & Command Control Centers', 'Cybersecurity Audits'],
+    mobile: '+91 9876543212',
+    profile_photo: '',
+    verification_status: 'approved',
+    account_status: 'active',
+    registration_date: subDays(now, 90)
+  });
+
+  db.insert('client_profiles', {
+    id: 'clp_bid002',
+    user_id: 'usr_company2',
+    full_name: 'Rajesh Singhania',
+    designation: 'Managing Director',
+    company_name: 'BuildCon Infrastructure Ltd',
+    business_type: 'Public Limited',
+    industry: 'Civil Works & Construction',
+    gstin: '27AABCB9876K1Z2',
+    pan: 'AABCB9876K',
+    address: 'Nariman Point',
+    city: 'Mumbai',
+    state: 'Maharashtra',
+    pin_code: '400021',
+    website: 'https://buildcon.com',
+    description: 'Premier construction and infrastructure company specializing in highways, bridges, and heavy civil works.',
+    years_experience: 12,
+    annual_turnover: '₹100-200 Cr',
+    employee_count: '500-1000',
+    services_products: ['Highway Construction', 'Bridge Engineering', 'Heavy Civil Works', 'Infrastructure Development'],
+    mobile: '+91 9876543216',
+    profile_photo: '',
+    verification_status: 'approved',
+    account_status: 'active',
+    registration_date: subDays(now, 120)
+  });
+
+  // Add client documents for existing demo bidders
+  ['usr_company', 'usr_company2'].forEach((uid, cidx) => {
+    ['company_registration', 'gst_certificate', 'pan_document', 'financial_statement'].forEach((dtype, didx) => {
+      db.insert('client_documents', {
+        user_id: uid,
+        document_type: dtype,
+        document_name: `${dtype.replace(/_/g, ' ').replace(/\b\w/g, c => c.toUpperCase())} - Demo`,
+        file_name: `demo_existing_${cidx}_${didx}.pdf`,
+        file_path: `/uploads/demo_existing_${cidx}_${didx}.pdf`,
+        file_size: Math.floor(300000 + Math.random() * 1500000),
+        mime_type: 'application/pdf',
+        expiry_date: null,
+        verification_status: 'verified',
+        uploaded_at: subDays(now, 30),
+        verified_by: 'usr_admin',
+        verified_at: subDays(now, 25)
+      });
+    });
+
+    // Activity for existing bidders
+    db.insert('client_activity', {
+      user_id: uid,
+      type: 'profile_updated',
+      title: 'Profile Completed',
+      description: 'Full client profile setup completed with all required details.',
+      icon: 'user-check',
+      created_at: subDays(now, 30)
+    });
+  });
+
   console.log('Seeding completed successfully!');
   console.log(`- Users: ${db.count('users')}`);
   console.log(`- Roles: ${db.count('roles')}`);
@@ -1184,6 +1586,9 @@ Eligibility: Must possess PESO license and ISO 13485. 24x7 on-site emergency per
   console.log(`- Tenders: ${db.count('tenders')}`);
   console.log(`- Bids: ${db.count('bids')}`);
   console.log(`- Audit Logs: ${db.count('audit_logs')}`);
+  console.log(`- Client Profiles: ${db.count('client_profiles')}`);
+  console.log(`- Client Documents: ${db.count('client_documents')}`);
+  console.log(`- Client Activity: ${db.count('client_activity')}`);
 }
 
 if (require.main === module) {
@@ -1191,3 +1596,4 @@ if (require.main === module) {
 }
 
 module.exports = seedDatabase;
+

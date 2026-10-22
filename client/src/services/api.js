@@ -146,5 +146,41 @@ export const api = {
 
   // Evaluator
   getEvaluations: () => request('/evaluations'),
-  updateEvaluation: (id, evalData) => request(`/evaluations/${id}`, { method: 'PATCH', body: JSON.stringify(evalData) })
+  updateEvaluation: (id, evalData) => request(`/evaluations/${id}`, { method: 'PATCH', body: JSON.stringify(evalData) }),
+
+  // ===== CLIENT DETAILS & SMART TENDER MATCHING MODULE =====
+  // Client Profile
+  getClientProfile: () => request('/client/profile'),
+  updateClientProfile: (profileData) => request('/client/profile', { method: 'PUT', body: JSON.stringify(profileData) }),
+
+  // Smart Tender Matching
+  getSmartMatches: () => request('/client/smart-matches'),
+
+  // Client Documents
+  getClientDocuments: () => request('/client/documents'),
+  uploadClientDocument: (formData) => request('/client/documents', { method: 'POST', body: formData }),
+  deleteClientDocument: (id) => request(`/client/documents/${id}`, { method: 'DELETE' }),
+
+  // Client Activity & Notifications
+  getClientActivity: () => request('/client/activity'),
+  getClientNotifications: (filter = '') => request(`/client/notifications${filter ? '?filter=' + filter : ''}`),
+  markClientNotificationRead: (id) => request(`/client/notifications/${id}/read`, { method: 'PATCH' }),
+
+  // Client Tender Actions
+  saveClientTender: (tenderId) => request('/client/save-tender', { method: 'POST', body: JSON.stringify({ tender_id: tenderId }) }),
+  applyClientTender: (data) => request('/client/apply-tender', { method: 'POST', body: JSON.stringify(data) }),
+
+  // Admin Client Management
+  getAdminClients: (params = {}) => {
+    const qs = new URLSearchParams(params).toString();
+    return request(`/admin/clients${qs ? '?' + qs : ''}`);
+  },
+  getAdminClientDetail: (id) => request(`/admin/clients/${id}`),
+  getAdminClientActivity: (id) => request(`/admin/clients/${id}/activity`),
+  toggleAdminClientStatus: (id) => request(`/admin/clients/${id}/toggle`, { method: 'PATCH' }),
+  verifyAdminClientDocument: (docId, status, remarks = '') => request(`/admin/client-documents/${docId}/verify`, {
+    method: 'PATCH',
+    body: JSON.stringify({ verification_status: status, remarks })
+  })
 };
+

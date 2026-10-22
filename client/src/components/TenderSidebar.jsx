@@ -14,6 +14,7 @@ import {
   Calendar, 
   Building, 
   Scale,
+  Target,
   Send,
   UserCheck,
   FileSpreadsheet,
@@ -59,6 +60,7 @@ export default function TenderSidebar({
     if (role === 'super_admin') {
       return [
         { id: 'admin', label: 'Admin Overview', icon: Crown },
+        { id: 'admin_clients', label: 'Client Management', icon: UserCheck },
         { id: 'admin_users', label: t('users') || 'Users', icon: Users },
         { id: 'admin_companies', label: t('companies') || 'Companies', icon: Building2 },
         { id: 'admin_authorities', label: t('authorities') || 'Authorities', icon: UserCheck },
@@ -92,9 +94,11 @@ export default function TenderSidebar({
       ];
     }
 
-    // Default: Company / Bidder matching exact user uploaded screenshot
+    // Default: Company / Bidder matching exact user uploaded screenshot + Client Profile & Smart Matching
     return [
       { id: 'tenders', label: 'Tenders', icon: FileText },
+      { id: 'smart_matching', label: 'Smart AI Matching', icon: Target },
+      { id: 'client_profile', label: 'Client Profile & Dashboard', icon: UserCheck },
       { id: 'tender_tasks', label: 'Tender Tasks', icon: CheckSquare, hasChevron: true, action: () => setCurrentTab('tasks') },
       { id: 'mis_reports', label: 'MIS & Reports', icon: FileSpreadsheet, action: onOpenMIS },
       { id: 'manage_files', label: 'Manage Files', icon: FolderKanban, hasChevron: true, action: onOpenFiles },

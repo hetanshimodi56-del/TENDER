@@ -14,7 +14,8 @@ const defaultSchema = {
   tender_authorities: [], company_profiles: [], user_preferences: [],
   tender_documents: [], saved_tenders: [], tender_tasks: [], categories: [],
   system_settings: [], tender_alerts: [], eligibility_checks: [],
-  ai_recommendations: [], ai_chat_history: []
+  ai_recommendations: [], ai_chat_history: [],
+  client_profiles: [], client_documents: [], client_activity: []
 };
 
 class Database {

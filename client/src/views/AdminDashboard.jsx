@@ -28,7 +28,15 @@ import {
   ArrowRight,
   Filter,
   Download,
-  Globe
+  Globe,
+  UserCheck,
+  X,
+  ExternalLink,
+  Phone,
+  Mail,
+  MapPin,
+  Calendar,
+  Building
 } from 'lucide-react';
 import { formatINR } from '../components/TenderCard';
 import { api } from '../services/api';
@@ -51,6 +59,21 @@ export default function AdminDashboard({ user, initialTab = 'overview', onViewDe
   const [userSearch, setUserSearch] = useState('');
   const [auditSearch, setAuditSearch] = useState('');
   const [tenderSearch, setTenderSearch] = useState('');
+
+  // Client Management state (Requirement 7)
+  const [clientsList, setClientsList] = useState([]);
+  const [clientSearch, setClientSearch] = useState('');
+  const [clientIndustryFilter, setClientIndustryFilter] = useState('');
+  const [clientCityFilter, setClientCityFilter] = useState('');
+  const [clientStatusFilter, setClientStatusFilter] = useState('');
+  const [clientPage, setClientPage] = useState(1);
+  const [clientTotalPages, setClientTotalPages] = useState(1);
+  const [clientTotalCount, setClientTotalCount] = useState(0);
+  const [clientsLoading, setClientsLoading] = useState(false);
+  const [selectedClientDetail, setSelectedClientDetail] = useState(null);
+  const [clientDetailModal, setClientDetailModal] = useState(false);
+  const [clientDetailLoading, setClientDetailLoading] = useState(false);
+  const [clientDetailSubTab, setClientDetailSubTab] = useState('profile');
 
   // Modals state
   const [showAddUserModal, setShowAddUserModal] = useState(false);
@@ -116,7 +139,8 @@ export default function AdminDashboard({ user, initialTab = 'overview', onViewDe
   useEffect(() => {
     if (initialTab) {
       // Map sidebar tabs to internal tabs
-      if (initialTab === 'admin_users') setActiveTab('users');
+      if (initialTab === 'admin_clients') setActiveTab('clients');
+      else if (initialTab === 'admin_users') setActiveTab('users');
       else if (initialTab === 'admin_companies') setActiveTab('companies');
       else if (initialTab === 'admin_authorities') setActiveTab('authorities');
       else if (initialTab === 'admin_tenders') setActiveTab('tenders');
@@ -134,10 +158,80 @@ export default function AdminDashboard({ user, initialTab = 'overview', onViewDe
     loadAdminData();
   }, []);
 
+  const loadAdminClients = async (pg = 1) => {
+    setClientsLoading(true);
+    try {
+      const res = await api.getAdminClients({
+        search: clientSearch,
+        industry: clientIndustryFilter === 'All' ? '' : clientIndustryFilter,
+        city: clientCityFilter === 'All' ? '' : clientCityFilter,
+        status: clientStatusFilter === 'All' ? '' : clientStatusFilter,
+        page: pg,
+        limit: 10
+      });
+      setClientsList(res.data || []);
+      setClientTotalCount(res.total || 0);
+      setClientTotalPages(res.totalPages || 1);
+      setClientPage(pg);
+    } catch (err) {
+      console.error('Failed to load admin clients:', err);
+    } finally {
+      setClientsLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    if (activeTab === 'clients') {
+      loadAdminClients(1);
+    }
+  }, [activeTab, clientIndustryFilter, clientCityFilter, clientStatusFilter]);
+
+  const handleOpenClientDetail = async (id) => {
+    setClientDetailModal(true);
+    setClientDetailLoading(true);
+    setClientDetailSubTab('profile');
+    try {
+      const res = await api.getAdminClientDetail(id);
+      setSelectedClientDetail(res.data);
+    } catch (err) {
+      if (onShowToast) onShowToast('Failed to load client details: ' + (err.message || 'Error'), 'error');
+    } finally {
+      setClientDetailLoading(false);
+    }
+  };
+
+  const handleToggleClientStatus = async (id, currentStatus) => {
+    const actionLabel = currentStatus === 'active' ? 'suspend' : 'activate';
+    if (!window.confirm(`Are you sure you want to ${actionLabel} this client account?`)) return;
+    try {
+      const res = await api.toggleAdminClientStatus(id);
+      if (onShowToast) onShowToast(res.message || `Client account ${actionLabel}d.`, 'success');
+      loadAdminClients(clientPage);
+      if (selectedClientDetail && (selectedClientDetail.profile?.user_id === id || selectedClientDetail.profile?.id === id)) {
+        handleOpenClientDetail(id);
+      }
+    } catch (err) {
+      if (onShowToast) onShowToast('Failed to update status: ' + (err.message || 'Error'), 'error');
+    }
+  };
+
+  const handleVerifyClientDocument = async (docId, status, remarks = '') => {
+    try {
+      const res = await api.verifyAdminClientDocument(docId, status, remarks);
+      if (onShowToast) onShowToast(res.message || `Document marked as ${status}.`, 'success');
+      if (selectedClientDetail && selectedClientDetail.profile) {
+        handleOpenClientDetail(selectedClientDetail.profile.user_id || selectedClientDetail.profile.id);
+      }
+      loadAdminClients(clientPage);
+    } catch (err) {
+      if (onShowToast) onShowToast('Failed to verify document: ' + (err.message || 'Error'), 'error');
+    }
+  };
+
   const loadAdminData = async () => {
     setLoading(true);
     try {
-      const [kpis, users, companies, authorities, tendersRes, bidsRes, audits, sysSettings] = await Promise.all([
+      const [kpis, users, companies, authorities, tendersRes, bidsRes, audits, sysSettings, clientsRes] = await Promise.all([
         api.getAdminKPIs().catch(() => ({})),
         api.getUsers().catch(() => ({ data: [] })),
         api.getCompanies().catch(() => ({ data: [] })),
@@ -145,7 +239,8 @@ export default function AdminDashboard({ user, initialTab = 'overview', onViewDe
         api.getTenders({ status: 'all' }).catch(() => ({ data: [] })),
         api.getAllBids().catch(() => ({ data: [] })),
         api.getAuditLogs().catch(() => ({ data: [] })),
-        api.getSystemSettings().catch(() => ({ data: {} }))
+        api.getSystemSettings().catch(() => ({ data: {} })),
+        api.getAdminClients().catch(() => ({ data: [] }))
       ]);
 
       setKpiData(kpis);
@@ -156,6 +251,7 @@ export default function AdminDashboard({ user, initialTab = 'overview', onViewDe
       setAllBids(bidsRes.data || []);
       setAuditLogs(audits.data || []);
       setSettings(sysSettings.data || {});
+      setClientsList(clientsRes.data || []);
     } catch (err) {
       console.error('Failed to load admin data:', err);
     } finally {
@@ -497,6 +593,13 @@ export default function AdminDashboard({ user, initialTab = 'overview', onViewDe
                   <ShieldCheck size={15} /> Approve Department Heads
                 </button>
                 <button
+                  onClick={() => setActiveTab('clients')}
+                  className="btn btn-secondary"
+                  style={{ width: '100%', justifyContent: 'center' }}
+                >
+                  <UserCheck size={15} /> Manage Clients & Match Logs
+                </button>
+                <button
                   onClick={() => setActiveTab('audits')}
                   className="btn btn-secondary"
                   style={{ width: '100%', justifyContent: 'center' }}
@@ -506,6 +609,281 @@ export default function AdminDashboard({ user, initialTab = 'overview', onViewDe
               </div>
             </div>
           </div>
+        </div>
+      )}
+
+      {/* TAB: CLIENT MANAGEMENT MODULE (Requirement 7) */}
+      {activeTab === 'clients' && (
+        <div style={{ background: 'var(--bg-card, #ffffff)', border: '1px solid var(--border-card, #e2e8f0)', borderRadius: 12, padding: '20px' }}>
+          {/* Header */}
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 20, flexWrap: 'wrap', gap: 12 }}>
+            <div>
+              <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+                <h3 style={{ fontSize: '1.15rem', fontWeight: 800, margin: 0, color: 'var(--text-main, #0f172a)' }}>
+                  Client Management & Governance Console
+                </h3>
+                <span style={{ fontSize: '0.72rem', background: '#e0f2fe', color: '#0369a1', padding: '2px 8px', borderRadius: 12, fontWeight: 700 }}>
+                  {clientTotalCount} Registered Clients
+                </span>
+              </div>
+              <p style={{ margin: '4px 0 0', fontSize: '0.78rem', color: '#64748b' }}>
+                Search and audit clients, verify submitted credentials, review tender history, and manage account statuses.
+              </p>
+            </div>
+            <button
+              onClick={() => loadAdminClients(clientPage)}
+              className="btn btn-sm btn-secondary"
+              disabled={clientsLoading}
+              style={{ display: 'flex', alignItems: 'center', gap: 6 }}
+            >
+              <RefreshCw size={13} className={clientsLoading ? 'spin' : ''} />
+              {clientsLoading ? 'Refreshing...' : 'Refresh Clients'}
+            </button>
+          </div>
+
+          {/* Filters Bar: Search, Industry, City, Status */}
+          <div style={{
+            display: 'grid',
+            gridTemplateColumns: '2fr 1fr 1fr 1fr auto',
+            gap: 10,
+            marginBottom: 18,
+            padding: 12,
+            background: 'var(--bg-main, #f8fafc)',
+            borderRadius: 10,
+            border: '1px solid var(--border-subtle, #e2e8f0)',
+            alignItems: 'center'
+          }}>
+            {/* Search Input */}
+            <div style={{ display: 'flex', alignItems: 'center', gap: 6, background: '#ffffff', border: '1px solid #cbd5e1', borderRadius: 8, padding: '6px 10px' }}>
+              <Search size={14} color="#64748b" />
+              <input
+                type="text"
+                placeholder="Search Client ID, Name, Company, Email..."
+                value={clientSearch}
+                onChange={e => setClientSearch(e.target.value)}
+                onKeyDown={e => e.key === 'Enter' && loadAdminClients(1)}
+                style={{ border: 'none', outline: 'none', fontSize: '0.8rem', width: '100%', background: 'transparent' }}
+              />
+              {clientSearch && (
+                <button onClick={() => { setClientSearch(''); setTimeout(() => loadAdminClients(1), 50); }} style={{ background: 'none', border: 'none', cursor: 'pointer', padding: 0 }}>
+                  <X size={13} color="#94a3b8" />
+                </button>
+              )}
+            </div>
+
+            {/* Industry Filter */}
+            <select
+              value={clientIndustryFilter}
+              onChange={e => setClientIndustryFilter(e.target.value)}
+              className="form-select"
+              style={{ fontSize: '0.78rem', padding: '6px 10px', height: 34 }}
+            >
+              <option value="">All Industries</option>
+              <option value="Renewable Energy">Renewable Energy</option>
+              <option value="IT & Software Solutions">IT & Software Solutions</option>
+              <option value="Civil & Transportation Infrastructure">Civil & Infrastructure</option>
+              <option value="Healthcare & Medical Supplies">Healthcare & Medical</option>
+              <option value="Water Treatment & Environmental Services">Water & Environmental</option>
+              <option value="Power Transmission & Electrical Grid">Power & Electrical</option>
+              <option value="Educational Technology & Training">EdTech & Training</option>
+              <option value="Smart City Solutions & IoT">Smart City & IoT</option>
+              <option value="Security Systems & Surveillance">Security Systems</option>
+              <option value="Facility Management & Services">Facility Management</option>
+            </select>
+
+            {/* City Filter */}
+            <select
+              value={clientCityFilter}
+              onChange={e => setClientCityFilter(e.target.value)}
+              className="form-select"
+              style={{ fontSize: '0.78rem', padding: '6px 10px', height: 34 }}
+            >
+              <option value="">All Cities</option>
+              <option value="Ahmedabad">Ahmedabad</option>
+              <option value="Bengaluru">Bengaluru</option>
+              <option value="Mumbai">Mumbai</option>
+              <option value="New Delhi">New Delhi</option>
+              <option value="Hyderabad">Hyderabad</option>
+              <option value="Pune">Pune</option>
+              <option value="Chennai">Chennai</option>
+              <option value="Gandhinagar">Gandhinagar</option>
+              <option value="Noida">Noida</option>
+            </select>
+
+            {/* Status Filter */}
+            <select
+              value={clientStatusFilter}
+              onChange={e => setClientStatusFilter(e.target.value)}
+              className="form-select"
+              style={{ fontSize: '0.78rem', padding: '6px 10px', height: 34 }}
+            >
+              <option value="">All Statuses</option>
+              <option value="active">Active Accounts</option>
+              <option value="suspended">Suspended Accounts</option>
+              <option value="verified">Verified Documents</option>
+            </select>
+
+            {/* Apply Button */}
+            <button
+              onClick={() => loadAdminClients(1)}
+              className="btn btn-sm btn-primary"
+              style={{ height: 34, padding: '0 14px' }}
+            >
+              Apply Filter
+            </button>
+          </div>
+
+          {/* Clients Ledger Table */}
+          {clientsLoading ? (
+            <div style={{ textAlign: 'center', padding: '40px 0', color: '#64748b' }}>
+              <RefreshCw size={24} className="spin" style={{ margin: '0 auto 8px' }} />
+              <div>Loading client records...</div>
+            </div>
+          ) : clientsList.length === 0 ? (
+            <div style={{ textAlign: 'center', padding: '40px 0', color: '#94a3b8' }}>
+              <UserCheck size={36} style={{ margin: '0 auto 8px', opacity: 0.5 }} />
+              <div style={{ fontWeight: 600 }}>No clients found matching the selected filters.</div>
+              <div style={{ fontSize: '0.78rem' }}>Try clearing the search or changing industry/city filter.</div>
+            </div>
+          ) : (
+            <div style={{ overflowX: 'auto' }}>
+              <table className="table" style={{ width: '100%', fontSize: '0.82rem', borderCollapse: 'collapse' }}>
+                <thead>
+                  <tr style={{ background: 'var(--bg-main, #f8fafc)', borderBottom: '1px solid var(--border-card, #e2e8f0)' }}>
+                    <th style={{ padding: '10px 12px', textAlign: 'left', color: '#64748b' }}>Client ID</th>
+                    <th style={{ padding: '10px 12px', textAlign: 'left', color: '#64748b' }}>Client & Company</th>
+                    <th style={{ padding: '10px 12px', textAlign: 'left', color: '#64748b' }}>Industry & Location</th>
+                    <th style={{ padding: '10px 12px', textAlign: 'center', color: '#64748b' }}>Bids Submitted</th>
+                    <th style={{ padding: '10px 12px', textAlign: 'center', color: '#64748b' }}>Documents</th>
+                    <th style={{ padding: '10px 12px', textAlign: 'center', color: '#64748b' }}>Account Status</th>
+                    <th style={{ padding: '10px 12px', textAlign: 'right', color: '#64748b' }}>Actions</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {clientsList.map(c => {
+                    const isActive = c.status === 'active';
+                    return (
+                      <tr key={c.id} style={{ borderBottom: '1px solid var(--border-subtle, #f1f5f9)' }}>
+                        <td style={{ padding: '10px 12px' }}>
+                          <span style={{
+                            padding: '3px 8px',
+                            borderRadius: 6,
+                            background: '#f1f5f9',
+                            fontFamily: 'monospace',
+                            fontWeight: 700,
+                            color: '#0f172a',
+                            fontSize: '0.75rem'
+                          }}>
+                            {c.user_id || c.id}
+                          </span>
+                        </td>
+                        <td style={{ padding: '10px 12px' }}>
+                          <div style={{ fontWeight: 700, color: 'var(--text-main, #0f172a)' }}>{c.name}</div>
+                          <div style={{ fontSize: '0.74rem', color: '#00796b', fontWeight: 600 }}>{c.company_name}</div>
+                          <div style={{ fontSize: '0.7rem', color: '#94a3b8' }}>{c.email}</div>
+                        </td>
+                        <td style={{ padding: '10px 12px' }}>
+                          <div style={{ fontWeight: 600, color: '#334155' }}>{c.industry || 'General Industry'}</div>
+                          <div style={{ fontSize: '0.72rem', color: '#64748b' }}>{c.city ? `${c.city}, ${c.state || ''}` : 'Location unlisted'}</div>
+                        </td>
+                        <td style={{ padding: '10px 12px', textAlign: 'center' }}>
+                          <div style={{ fontWeight: 700, color: '#0f172a' }}>{c.total_bids || 0}</div>
+                          <div style={{ fontSize: '0.68rem', color: '#10b981', fontWeight: 700 }}>
+                            {c.won_bids ? `${c.won_bids} Won` : '0 Won'}
+                          </div>
+                        </td>
+                        <td style={{ padding: '10px 12px', textAlign: 'center' }}>
+                          <span style={{
+                            padding: '2px 8px',
+                            borderRadius: 10,
+                            fontSize: '0.72rem',
+                            fontWeight: 700,
+                            background: (c.verified_documents === c.total_documents && c.total_documents > 0) ? '#dcfce7' : '#fef3c7',
+                            color: (c.verified_documents === c.total_documents && c.total_documents > 0) ? '#166534' : '#92400e'
+                          }}>
+                            {c.verified_documents || 0} / {c.total_documents || 0} Verified
+                          </span>
+                        </td>
+                        <td style={{ padding: '10px 12px', textAlign: 'center' }}>
+                          <span style={{
+                            display: 'inline-flex',
+                            alignItems: 'center',
+                            gap: 4,
+                            padding: '3px 8px',
+                            borderRadius: 12,
+                            fontSize: '0.72rem',
+                            fontWeight: 700,
+                            background: isActive ? '#dcfce7' : '#fee2e2',
+                            color: isActive ? '#166534' : '#991b1b'
+                          }}>
+                            <span style={{ width: 6, height: 6, borderRadius: '50%', background: isActive ? '#16a34a' : '#dc2626' }}></span>
+                            {isActive ? 'Active' : 'Suspended'}
+                          </span>
+                        </td>
+                        <td style={{ padding: '10px 12px', textAlign: 'right' }}>
+                          <div style={{ display: 'flex', gap: 6, justifyContent: 'flex-end' }}>
+                            <button
+                              onClick={() => handleOpenClientDetail(c.id)}
+                              className="btn btn-sm btn-secondary"
+                              style={{ padding: '4px 9px', fontSize: '0.74rem', display: 'flex', alignItems: 'center', gap: 4 }}
+                              title="View full dossier, tender history, and submitted documents"
+                            >
+                              <Eye size={13} /> View Dossier
+                            </button>
+                            <button
+                              onClick={() => handleToggleClientStatus(c.id, c.status)}
+                              style={{
+                                padding: '4px 9px',
+                                borderRadius: 6,
+                                border: 'none',
+                                background: isActive ? '#fee2e2' : '#dcfce7',
+                                color: isActive ? '#dc2626' : '#166534',
+                                fontSize: '0.74rem',
+                                fontWeight: 700,
+                                cursor: 'pointer',
+                                display: 'flex',
+                                alignItems: 'center',
+                                gap: 4
+                              }}
+                              title={isActive ? 'Suspend account access' : 'Activate account access'}
+                            >
+                              {isActive ? <Ban size={12} /> : <Check size={12} />}
+                              {isActive ? 'Suspend' : 'Activate'}
+                            </button>
+                          </div>
+                        </td>
+                      </tr>
+                    );
+                  })}
+                </tbody>
+              </table>
+
+              {/* Pagination */}
+              {clientTotalPages > 1 && (
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginTop: 14, paddingTop: 12, borderTop: '1px solid #e2e8f0', fontSize: '0.78rem' }}>
+                  <span style={{ color: '#64748b' }}>
+                    Showing page {clientPage} of {clientTotalPages} ({clientTotalCount} total clients)
+                  </span>
+                  <div style={{ display: 'flex', gap: 6 }}>
+                    <button
+                      onClick={() => loadAdminClients(clientPage - 1)}
+                      disabled={clientPage <= 1}
+                      className="btn btn-sm btn-secondary"
+                    >
+                      Previous
+                    </button>
+                    <button
+                      onClick={() => loadAdminClients(clientPage + 1)}
+                      disabled={clientPage >= clientTotalPages}
+                      className="btn btn-sm btn-secondary"
+                    >
+                      Next
+                    </button>
+                  </div>
+                </div>
+              )}
+            </div>
+          )}
         </div>
       )}
 
@@ -1390,6 +1768,474 @@ export default function AdminDashboard({ user, initialTab = 'overview', onViewDe
                 <button type="submit" className="btn btn-primary">Save Changes</button>
               </div>
             </form>
+          </div>
+        </div>
+      )}
+
+      {/* Client Dossier & Document Verification Modal (Requirement 7) */}
+      {clientDetailModal && (
+        <div style={{
+          position: 'fixed', top: 0, left: 0, right: 0, bottom: 0,
+          background: 'rgba(15, 23, 42, 0.75)', backdropFilter: 'blur(6px)',
+          display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 1200,
+          padding: 20
+        }}>
+          <div style={{
+            background: '#ffffff',
+            borderRadius: 16,
+            width: '100%',
+            maxWidth: 960,
+            maxHeight: '90vh',
+            display: 'flex',
+            flexDirection: 'column',
+            boxShadow: '0 25px 60px rgba(0,0,0,0.3)',
+            overflow: 'hidden'
+          }}>
+            {/* Modal Header */}
+            <div style={{
+              padding: '18px 24px',
+              borderBottom: '1px solid #e2e8f0',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'space-between',
+              background: '#0f172a',
+              color: '#ffffff'
+            }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
+                <div style={{
+                  width: 44, height: 44, borderRadius: 10,
+                  background: 'linear-gradient(135deg, #0284c7, #0369a1)',
+                  display: 'flex', alignItems: 'center', justifyContent: 'center',
+                  fontWeight: 800, fontSize: '1rem', color: '#ffffff'
+                }}>
+                  {selectedClientDetail?.profile?.full_name?.charAt(0) || 'C'}
+                </div>
+                <div>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+                    <span style={{ fontSize: '1.15rem', fontWeight: 800 }}>
+                      {selectedClientDetail?.profile?.full_name || 'Client Dossier'}
+                    </span>
+                    <span style={{
+                      padding: '2px 8px', borderRadius: 6,
+                      background: 'rgba(255,255,255,0.15)',
+                      fontFamily: 'monospace', fontSize: '0.74rem', fontWeight: 700
+                    }}>
+                      {selectedClientDetail?.profile?.user_id_formatted || selectedClientDetail?.profile?.user_id}
+                    </span>
+                  </div>
+                  <div style={{ fontSize: '0.78rem', color: '#94a3b8' }}>
+                    {selectedClientDetail?.profile?.designation} • <strong style={{ color: '#38bdf8' }}>{selectedClientDetail?.profile?.company_name}</strong>
+                  </div>
+                </div>
+              </div>
+
+              <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+                {selectedClientDetail?.profile && (
+                  <button
+                    onClick={() => handleToggleClientStatus(selectedClientDetail.profile.user_id, selectedClientDetail.profile.account_status)}
+                    style={{
+                      padding: '6px 12px',
+                      borderRadius: 8,
+                      border: 'none',
+                      background: selectedClientDetail.profile.account_status === 'active' ? '#ef4444' : '#10b981',
+                      color: '#ffffff',
+                      fontSize: '0.74rem',
+                      fontWeight: 700,
+                      cursor: 'pointer',
+                      display: 'flex',
+                      alignItems: 'center',
+                      gap: 4
+                    }}
+                  >
+                    {selectedClientDetail.profile.account_status === 'active' ? <Ban size={13} /> : <Check size={13} />}
+                    {selectedClientDetail.profile.account_status === 'active' ? 'Suspend Account' : 'Activate Account'}
+                  </button>
+                )}
+                <button
+                  onClick={() => { setClientDetailModal(false); setSelectedClientDetail(null); }}
+                  style={{ background: 'transparent', border: 'none', color: '#94a3b8', cursor: 'pointer', padding: 4 }}
+                >
+                  <X size={20} />
+                </button>
+              </div>
+            </div>
+
+            {/* Modal Sub-tabs */}
+            <div style={{
+              display: 'flex',
+              gap: 8,
+              padding: '10px 24px',
+              background: '#f8fafc',
+              borderBottom: '1px solid #e2e8f0'
+            }}>
+              {[
+                { id: 'profile', label: 'Client Profile', icon: UserCheck },
+                { id: 'documents', label: `Submitted Documents (${selectedClientDetail?.documents?.length || 0})`, icon: FileText },
+                { id: 'tenders', label: `Tender History (${selectedClientDetail?.bids?.length || 0})`, icon: Send },
+                { id: 'activity', label: 'Activity Logs', icon: History }
+              ].map(t => {
+                const isTabActive = clientDetailSubTab === t.id;
+                const TabIcon = t.icon;
+                return (
+                  <button
+                    key={t.id}
+                    onClick={() => setClientDetailSubTab(t.id)}
+                    style={{
+                      display: 'flex', alignItems: 'center', gap: 6,
+                      padding: '7px 14px', borderRadius: 8, border: 'none',
+                      fontSize: '0.8rem', fontWeight: isTabActive ? 700 : 500,
+                      background: isTabActive ? '#0284c7' : 'transparent',
+                      color: isTabActive ? '#ffffff' : '#64748b',
+                      cursor: 'pointer'
+                    }}
+                  >
+                    <TabIcon size={14} />
+                    {t.label}
+                  </button>
+                );
+              })}
+            </div>
+
+            {/* Modal Body */}
+            <div style={{ flex: 1, overflowY: 'auto', padding: 24 }}>
+              {clientDetailLoading ? (
+                <div style={{ textAlign: 'center', padding: '60px 0', color: '#64748b' }}>
+                  <RefreshCw size={28} className="spin" style={{ margin: '0 auto 12px' }} />
+                  <div>Loading full client dossier...</div>
+                </div>
+              ) : !selectedClientDetail ? (
+                <div style={{ textAlign: 'center', padding: '60px 0', color: '#94a3b8' }}>
+                  No details available.
+                </div>
+              ) : (
+                <>
+                  {/* SUBTAB 1: CLIENT PROFILE */}
+                  {clientDetailSubTab === 'profile' && (
+                    <div style={{ display: 'flex', flexDirection: 'column', gap: 20 }}>
+                      {/* Summary Cards */}
+                      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 12 }}>
+                        <div style={{ background: '#f8fafc', padding: 14, borderRadius: 10, border: '1px solid #e2e8f0' }}>
+                          <div style={{ fontSize: '0.7rem', color: '#64748b', fontWeight: 700 }}>ANNUAL TURNOVER</div>
+                          <div style={{ fontSize: '1.2rem', fontWeight: 800, color: '#0f172a', margin: '4px 0' }}>
+                            {selectedClientDetail.profile.annual_turnover_range || '₹25 Cr - ₹100 Cr'}
+                          </div>
+                          <div style={{ fontSize: '0.7rem', color: '#0284c7' }}>{selectedClientDetail.profile.years_experience || 5}+ Years Experience</div>
+                        </div>
+                        <div style={{ background: '#f8fafc', padding: 14, borderRadius: 10, border: '1px solid #e2e8f0' }}>
+                          <div style={{ fontSize: '0.7rem', color: '#64748b', fontWeight: 700 }}>VERIFICATION STATUS</div>
+                          <div style={{ fontSize: '1.1rem', fontWeight: 800, color: '#16a34a', margin: '4px 0', textTransform: 'capitalize' }}>
+                            {selectedClientDetail.profile.verification_status || 'Verified'} ✓
+                          </div>
+                          <div style={{ fontSize: '0.7rem', color: '#64748b' }}>Account: {selectedClientDetail.profile.account_status}</div>
+                        </div>
+                        <div style={{ background: '#f8fafc', padding: 14, borderRadius: 10, border: '1px solid #e2e8f0' }}>
+                          <div style={{ fontSize: '0.7rem', color: '#64748b', fontWeight: 700 }}>BIDS SUBMITTED</div>
+                          <div style={{ fontSize: '1.2rem', fontWeight: 800, color: '#0f172a', margin: '4px 0' }}>
+                            {selectedClientDetail.stats?.applied || selectedClientDetail.bids?.length || 0}
+                          </div>
+                          <div style={{ fontSize: '0.7rem', color: '#16a34a' }}>Won: {selectedClientDetail.stats?.won || 0} Tenders</div>
+                        </div>
+                        <div style={{ background: '#f8fafc', padding: 14, borderRadius: 10, border: '1px solid #e2e8f0' }}>
+                          <div style={{ fontSize: '0.7rem', color: '#64748b', fontWeight: 700 }}>EMPLOYEES</div>
+                          <div style={{ fontSize: '1.2rem', fontWeight: 800, color: '#0f172a', margin: '4px 0' }}>
+                            {selectedClientDetail.profile.employees_count || '50-250'}
+                          </div>
+                          <div style={{ fontSize: '0.7rem', color: '#64748b' }}>{selectedClientDetail.profile.business_type}</div>
+                        </div>
+                      </div>
+
+                      {/* Detailed Fields Grid */}
+                      <div style={{
+                        display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: 16,
+                        background: '#ffffff', border: '1px solid #e2e8f0', borderRadius: 12, padding: 18
+                      }}>
+                        <div>
+                          <div style={{ fontSize: '0.72rem', color: '#64748b', fontWeight: 700 }}>FULL NAME & DESIGNATION</div>
+                          <div style={{ fontSize: '0.9rem', fontWeight: 700, color: '#0f172a' }}>
+                            {selectedClientDetail.profile.full_name} ({selectedClientDetail.profile.designation})
+                          </div>
+                        </div>
+                        <div>
+                          <div style={{ fontSize: '0.72rem', color: '#64748b', fontWeight: 700 }}>COMPANY NAME & TYPE</div>
+                          <div style={{ fontSize: '0.9rem', fontWeight: 700, color: '#0284c7' }}>
+                            {selectedClientDetail.profile.company_name} • {selectedClientDetail.profile.business_type}
+                          </div>
+                        </div>
+                        <div>
+                          <div style={{ fontSize: '0.72rem', color: '#64748b', fontWeight: 700 }}>PRIMARY CONTACT</div>
+                          <div style={{ fontSize: '0.85rem', color: '#334155' }}>
+                            {selectedClientDetail.profile.email} • {selectedClientDetail.profile.phone}
+                          </div>
+                        </div>
+                        <div>
+                          <div style={{ fontSize: '0.72rem', color: '#64748b', fontWeight: 700 }}>INDUSTRY CLUSTER</div>
+                          <div style={{ fontSize: '0.85rem', color: '#334155' }}>
+                            {selectedClientDetail.profile.industry}
+                          </div>
+                        </div>
+                        <div>
+                          <div style={{ fontSize: '0.72rem', color: '#64748b', fontWeight: 700 }}>GSTIN (DUMMY PLACEHOLDER)</div>
+                          <div style={{ fontSize: '0.85rem', fontFamily: 'monospace', fontWeight: 700, color: '#475569' }}>
+                            {selectedClientDetail.profile.gstin || '24AAACT1234F1Z8'}
+                          </div>
+                        </div>
+                        <div>
+                          <div style={{ fontSize: '0.72rem', color: '#64748b', fontWeight: 700 }}>PAN (DUMMY PLACEHOLDER)</div>
+                          <div style={{ fontSize: '0.85rem', fontFamily: 'monospace', fontWeight: 700, color: '#475569' }}>
+                            {selectedClientDetail.profile.pan || 'AAACT1234F'}
+                          </div>
+                        </div>
+                        <div style={{ gridColumn: 'span 2' }}>
+                          <div style={{ fontSize: '0.72rem', color: '#64748b', fontWeight: 700 }}>REGISTERED ADDRESS</div>
+                          <div style={{ fontSize: '0.85rem', color: '#334155' }}>
+                            {selectedClientDetail.profile.address}, {selectedClientDetail.profile.city}, {selectedClientDetail.profile.state} - {selectedClientDetail.profile.pincode}
+                          </div>
+                        </div>
+                        <div style={{ gridColumn: 'span 2' }}>
+                          <div style={{ fontSize: '0.72rem', color: '#64748b', fontWeight: 700 }}>SERVICES & PRODUCTS OFFERED</div>
+                          <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap', marginTop: 4 }}>
+                            {(Array.isArray(selectedClientDetail.profile.services_offered)
+                              ? selectedClientDetail.profile.services_offered
+                              : (selectedClientDetail.profile.services_offered || '').split(',')
+                            ).map((s, idx) => (
+                              <span key={idx} style={{
+                                padding: '3px 10px', borderRadius: 12,
+                                background: '#f1f5f9', fontSize: '0.74rem', color: '#334155', fontWeight: 600
+                              }}>
+                                {typeof s === 'string' ? s.trim() : s}
+                              </span>
+                            ))}
+                          </div>
+                        </div>
+                        <div style={{ gridColumn: 'span 2' }}>
+                          <div style={{ fontSize: '0.72rem', color: '#64748b', fontWeight: 700 }}>COMPANY OVERVIEW</div>
+                          <div style={{ fontSize: '0.82rem', color: '#64748b', lineHeight: 1.5, marginTop: 3 }}>
+                            {selectedClientDetail.profile.description}
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  )}
+
+                  {/* SUBTAB 2: SUBMITTED DOCUMENTS & VERIFICATION SUITE */}
+                  {clientDetailSubTab === 'documents' && (
+                    <div>
+                      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 14 }}>
+                        <h4 style={{ margin: 0, fontSize: '0.96rem', fontWeight: 700 }}>
+                          Submitted Compliance & Qualification Credentials
+                        </h4>
+                        <span style={{ fontSize: '0.74rem', color: '#64748b' }}>
+                          Admins can approve or reject credentials with instant client notification.
+                        </span>
+                      </div>
+
+                      {(!selectedClientDetail.documents || selectedClientDetail.documents.length === 0) ? (
+                        <div style={{ textAlign: 'center', padding: '40px 0', color: '#94a3b8' }}>
+                          No documents uploaded yet by this client.
+                        </div>
+                      ) : (
+                        <table className="table" style={{ width: '100%', fontSize: '0.82rem', borderCollapse: 'collapse' }}>
+                          <thead>
+                            <tr style={{ background: '#f8fafc', borderBottom: '1px solid #e2e8f0' }}>
+                              <th style={{ padding: '8px 12px', textAlign: 'left', color: '#64748b' }}>Document Type</th>
+                              <th style={{ padding: '8px 12px', textAlign: 'left', color: '#64748b' }}>File Name</th>
+                              <th style={{ padding: '8px 12px', textAlign: 'left', color: '#64748b' }}>Upload Date</th>
+                              <th style={{ padding: '8px 12px', textAlign: 'left', color: '#64748b' }}>Expiry Date</th>
+                              <th style={{ padding: '8px 12px', textAlign: 'center', color: '#64748b' }}>Status</th>
+                              <th style={{ padding: '8px 12px', textAlign: 'right', color: '#64748b' }}>Admin Verification</th>
+                            </tr>
+                          </thead>
+                          <tbody>
+                            {selectedClientDetail.documents.map(doc => {
+                              const isDocVerified = doc.verification_status === 'verified';
+                              return (
+                                <tr key={doc.id} style={{ borderBottom: '1px solid #f1f5f9' }}>
+                                  <td style={{ padding: '10px 12px', fontWeight: 600, color: '#0f172a' }}>
+                                    {doc.document_type?.replace(/_/g, ' ')?.toUpperCase()}
+                                  </td>
+                                  <td style={{ padding: '10px 12px', color: '#0284c7' }}>
+                                    {doc.document_name}
+                                  </td>
+                                  <td style={{ padding: '10px 12px', color: '#64748b' }}>
+                                    {new Date(doc.upload_date).toLocaleDateString()}
+                                  </td>
+                                  <td style={{ padding: '10px 12px', color: '#64748b' }}>
+                                    {doc.expiry_date ? new Date(doc.expiry_date).toLocaleDateString() : 'N/A'}
+                                  </td>
+                                  <td style={{ padding: '10px 12px', textAlign: 'center' }}>
+                                    <span style={{
+                                      padding: '2px 8px', borderRadius: 10, fontSize: '0.72rem', fontWeight: 700,
+                                      background: isDocVerified ? '#dcfce7' : '#fef3c7',
+                                      color: isDocVerified ? '#166534' : '#92400e'
+                                    }}>
+                                      {doc.verification_status || 'Pending'}
+                                    </span>
+                                  </td>
+                                  <td style={{ padding: '10px 12px', textAlign: 'right' }}>
+                                    <div style={{ display: 'flex', gap: 6, justifyContent: 'flex-end' }}>
+                                      {!isDocVerified ? (
+                                        <button
+                                          onClick={() => handleVerifyClientDocument(doc.id, 'verified')}
+                                          style={{
+                                            padding: '4px 10px', borderRadius: 6, border: 'none',
+                                            background: '#16a34a', color: '#ffffff',
+                                            fontSize: '0.72rem', fontWeight: 700, cursor: 'pointer'
+                                          }}
+                                        >
+                                          Verify ✓
+                                        </button>
+                                      ) : (
+                                        <button
+                                          onClick={() => {
+                                            const reason = window.prompt('Enter reason for revoking/rejecting document:');
+                                            if (reason !== null) {
+                                              handleVerifyClientDocument(doc.id, 'rejected', reason);
+                                            }
+                                          }}
+                                          style={{
+                                            padding: '4px 10px', borderRadius: 6, border: 'none',
+                                            background: '#fee2e2', color: '#dc2626',
+                                            fontSize: '0.72rem', fontWeight: 700, cursor: 'pointer'
+                                          }}
+                                        >
+                                          Reject ✗
+                                        </button>
+                                      )}
+                                      <a
+                                        href={doc.file_path || '#'}
+                                        target="_blank"
+                                        rel="noreferrer"
+                                        style={{
+                                          padding: '4px 8px', borderRadius: 6,
+                                          background: '#f1f5f9', color: '#334155',
+                                          fontSize: '0.72rem', textDecoration: 'none', fontWeight: 600,
+                                          display: 'inline-flex', alignItems: 'center', gap: 4
+                                        }}
+                                      >
+                                        <Download size={11} /> Download
+                                      </a>
+                                    </div>
+                                  </td>
+                                </tr>
+                              );
+                            })}
+                          </tbody>
+                        </table>
+                      )}
+                    </div>
+                  )}
+
+                  {/* SUBTAB 3: TENDER HISTORY & BIDS */}
+                  {clientDetailSubTab === 'tenders' && (
+                    <div>
+                      <h4 style={{ margin: '0 0 14px', fontSize: '0.96rem', fontWeight: 700 }}>
+                        Tender Participation & Bidding Record
+                      </h4>
+                      {(!selectedClientDetail.bids || selectedClientDetail.bids.length === 0) ? (
+                        <div style={{ textAlign: 'center', padding: '40px 0', color: '#94a3b8' }}>
+                          No bids submitted yet by this client.
+                        </div>
+                      ) : (
+                        <table className="table" style={{ width: '100%', fontSize: '0.82rem', borderCollapse: 'collapse' }}>
+                          <thead>
+                            <tr style={{ background: '#f8fafc', borderBottom: '1px solid #e2e8f0' }}>
+                              <th style={{ padding: '8px 12px', textAlign: 'left', color: '#64748b' }}>Tender ID / Title</th>
+                              <th style={{ padding: '8px 12px', textAlign: 'right', color: '#64748b' }}>Submitted Bid</th>
+                              <th style={{ padding: '8px 12px', textAlign: 'center', color: '#64748b' }}>Submission Date</th>
+                              <th style={{ padding: '8px 12px', textAlign: 'center', color: '#64748b' }}>Bid Status</th>
+                            </tr>
+                          </thead>
+                          <tbody>
+                            {selectedClientDetail.bids.map(b => (
+                              <tr key={b.id} style={{ borderBottom: '1px solid #f1f5f9' }}>
+                                <td style={{ padding: '10px 12px' }}>
+                                  <div style={{ fontWeight: 700, color: '#0f172a' }}>{b.tender_title || b.tender_id}</div>
+                                  <div style={{ fontSize: '0.7rem', color: '#94a3b8', fontFamily: 'monospace' }}>Ref: {b.tender_id}</div>
+                                </td>
+                                <td style={{ padding: '10px 12px', textAlign: 'right', fontWeight: 700, color: '#00796b' }}>
+                                  {formatINR(b.bid_amount || b.price_bid || 0)}
+                                </td>
+                                <td style={{ padding: '10px 12px', textAlign: 'center', color: '#64748b' }}>
+                                  {new Date(b.submitted_at || b.created_at).toLocaleDateString()}
+                                </td>
+                                <td style={{ padding: '10px 12px', textAlign: 'center' }}>
+                                  <span style={{
+                                    padding: '3px 8px', borderRadius: 10, fontSize: '0.72rem', fontWeight: 700,
+                                    background: b.status === 'awarded' ? '#dcfce7' : (b.status === 'rejected' ? '#fee2e2' : '#fef3c7'),
+                                    color: b.status === 'awarded' ? '#166534' : (b.status === 'rejected' ? '#991b1b' : '#92400e')
+                                  }}>
+                                    {(b.status || 'Submitted').toUpperCase()}
+                                  </span>
+                                </td>
+                              </tr>
+                            ))}
+                          </tbody>
+                        </table>
+                      )}
+                    </div>
+                  )}
+
+                  {/* SUBTAB 4: ACTIVITY LOGS */}
+                  {clientDetailSubTab === 'activity' && (
+                    <div>
+                      <h4 style={{ margin: '0 0 14px', fontSize: '0.96rem', fontWeight: 700 }}>
+                        Client Activity & Audit History
+                      </h4>
+                      {(!selectedClientDetail.recent_activity || selectedClientDetail.recent_activity.length === 0) ? (
+                        <div style={{ textAlign: 'center', padding: '40px 0', color: '#94a3b8' }}>
+                          No activity recorded yet for this client.
+                        </div>
+                      ) : (
+                        <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
+                          {selectedClientDetail.recent_activity.map((act, idx) => (
+                            <div key={idx} style={{
+                              display: 'flex', alignItems: 'flex-start', gap: 12,
+                              padding: 12, borderRadius: 8, background: '#f8fafc', border: '1px solid #e2e8f0'
+                            }}>
+                              <div style={{
+                                width: 28, height: 28, borderRadius: 6, background: '#e0f2fe',
+                                display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#0369a1',
+                                flexShrink: 0, marginTop: 2
+                              }}>
+                                <History size={14} />
+                              </div>
+                              <div style={{ flex: 1 }}>
+                                <div style={{ fontSize: '0.82rem', fontWeight: 700, color: '#0f172a' }}>
+                                  {act.title || act.type}
+                                </div>
+                                <div style={{ fontSize: '0.78rem', color: '#64748b', marginTop: 2 }}>
+                                  {act.description}
+                                </div>
+                              </div>
+                              <div style={{ fontSize: '0.7rem', color: '#94a3b8', whiteSpace: 'nowrap' }}>
+                                {new Date(act.created_at).toLocaleString()}
+                              </div>
+                            </div>
+                          ))}
+                        </div>
+                      )}
+                    </div>
+                  )}
+                </>
+              )}
+            </div>
+
+            {/* Modal Footer */}
+            <div style={{
+              padding: '12px 24px',
+              borderTop: '1px solid #e2e8f0',
+              display: 'flex',
+              justifyContent: 'flex-end',
+              background: '#f8fafc'
+            }}>
+              <button
+                type="button"
+                onClick={() => { setClientDetailModal(false); setSelectedClientDetail(null); }}
+                className="btn btn-secondary"
+              >
+                Close Dossier
+              </button>
+            </div>
           </div>
         </div>
       )}

@@ -10,6 +10,7 @@ import TendersListView from './views/TendersListView';
 import MyTenders from './views/MyTenders';
 import SmartCalendar from './views/SmartCalendar';
 import CompanyProfileView from './views/CompanyProfileView';
+import ClientModuleView from './views/ClientModuleView';
 import AuthorityPortal from './views/AuthorityPortal';
 import AdminDashboard from './views/AdminDashboard';
 import EvaluatorPortal from './views/EvaluatorPortal';
@@ -610,8 +611,18 @@ export default function App() {
                 <SmartCalendar onViewDetailsById={handleOpenDetailsById} />
               )}
 
-              {currentTab === 'profile' && (
-                <CompanyProfileView onProfileUpdated={loadSavedTenders} />
+              {(currentTab === 'profile' || currentTab === 'client_profile' || currentTab === 'smart_matching' || currentTab === 'client_documents' || currentTab === 'client_dashboard' || currentTab === 'client_activity' || currentTab === 'client_module') && (
+                <ClientModuleView
+                  user={user}
+                  initialTab={
+                    currentTab === 'smart_matching' ? 'matching' :
+                    currentTab === 'client_documents' ? 'documents' :
+                    currentTab === 'client_dashboard' ? 'dashboard' :
+                    currentTab === 'client_activity' ? 'activity' : 'profile'
+                  }
+                  onShowToast={showToast}
+                  onViewTenderDetails={handleOpenDetailsById}
+                />
               )}
 
               {/* Tender Authority / Department Head */}

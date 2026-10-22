@@ -199,4 +199,38 @@ router.get('/admin/audits', authMiddleware, adminMiddleware, adminCtrl.getAuditL
 router.get('/evaluations', authMiddleware, requireRole('evaluator', 'super_admin'), evalCtrl.getAssignedEvaluations);
 router.patch('/evaluations/:id', authMiddleware, requireRole('evaluator', 'super_admin'), evalCtrl.updateEvaluationScore);
 
+/* ==========================================================================
+   10. CLIENT DETAILS & SMART TENDER MATCHING MODULE
+   ========================================================================== */
+const clientCtrl = require('../controllers/clientController');
+
+// Client Profile
+router.get('/client/profile', authMiddleware, clientCtrl.getClientProfile);
+router.put('/client/profile', authMiddleware, clientCtrl.updateClientProfile);
+
+// Smart Tender Matching (AI-Based)
+router.get('/client/smart-matches', authMiddleware, clientCtrl.getSmartMatches);
+
+// Client Documents
+router.get('/client/documents', authMiddleware, clientCtrl.getClientDocuments);
+router.post('/client/documents', authMiddleware, upload.single('file'), clientCtrl.uploadClientDocument);
+router.delete('/client/documents/:id', authMiddleware, clientCtrl.deleteClientDocument);
+
+// Client Activity & Notifications
+router.get('/client/activity', authMiddleware, clientCtrl.getClientActivity);
+router.get('/client/notifications', authMiddleware, clientCtrl.getClientNotifications);
+router.patch('/client/notifications/:id/read', authMiddleware, clientCtrl.markNotificationRead);
+
+// Client Tender Actions
+router.post('/client/save-tender', authMiddleware, clientCtrl.saveTender);
+router.post('/client/apply-tender', authMiddleware, clientCtrl.applyToTender);
+
+// Admin Client Management
+router.get('/admin/clients', authMiddleware, adminMiddleware, clientCtrl.adminGetAllClients);
+router.get('/admin/clients/:id', authMiddleware, adminMiddleware, clientCtrl.adminGetClientDetail);
+router.get('/admin/clients/:id/activity', authMiddleware, adminMiddleware, clientCtrl.adminGetClientActivity);
+router.patch('/admin/clients/:id/toggle', authMiddleware, adminMiddleware, clientCtrl.adminToggleClientStatus);
+router.patch('/admin/client-documents/:id/verify', authMiddleware, adminMiddleware, clientCtrl.adminVerifyDocument);
+
 module.exports = router;
+
