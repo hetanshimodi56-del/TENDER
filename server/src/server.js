@@ -131,13 +131,21 @@ app.get('/api/health', (req, res) => {
   });
 });
 
+// Resolve frontend dist directory (supports root repo layout as well as server-contained bundle for hosting)
+const possibleDistPaths = [
+  path.join(__dirname, '..', 'client_dist'),
+  path.join(__dirname, '..', '..', 'client', 'dist'),
+  path.join(__dirname, '..', 'dist')
+];
+const clientDistPath = possibleDistPaths.find(p => require('fs').existsSync(path.join(p, 'index.html'))) || possibleDistPaths[0];
+const hasFrontendDist = require('fs').existsSync(path.join(clientDistPath, 'index.html'));
+
 app.get('/', (req, res, next) => {
-  const clientDist = path.join(__dirname, '..', '..', 'client', 'dist');
-  if (require('fs').existsSync(clientDist)) {
+  if (hasFrontendDist) {
     res.setHeader('Cache-Control', 'no-cache, no-store, must-revalidate');
     res.setHeader('Pragma', 'no-cache');
     res.setHeader('Expires', '0');
-    return res.sendFile(path.join(clientDist, 'index.html'));
+    return res.sendFile(path.join(clientDistPath, 'index.html'));
   }
   res.json({
     status: 'online',
@@ -215,8 +223,7 @@ function render403Html(res, message, userRole, requiredRole) {
 }
 
 // Serve Frontend Build if available
-const clientDistPath = path.join(__dirname, '..', '..', 'client', 'dist');
-if (require('fs').existsSync(clientDistPath)) {
+if (hasFrontendDist) {
   // Serve hashed JS/CSS assets with long-term cache (they change name on rebuild)
   app.use('/assets', express.static(path.join(clientDistPath, 'assets'), {
     maxAge: '7d',
