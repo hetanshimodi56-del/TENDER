@@ -276,7 +276,7 @@ export default function TenderDetailsModal({
                 <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: 12, fontSize: '0.84rem' }}>
                   <div style={{ background: 'var(--bg-card)', padding: '10px 12px', borderRadius: 8, border: '1px solid var(--border-subtle)' }}>
                     <div style={{ fontSize: '0.72rem', color: 'var(--text-muted)', fontWeight: 700, textTransform: 'uppercase' }}>Tender Purpose</div>
-                    <div style={{ color: 'var(--text-main)', marginTop: 2 }}>{(tender.description || \'\').substring(0, 130) + '...' : 'Execution per RFP specifications.'}</div>
+                    <div style={{ color: 'var(--text-main)', marginTop: 2 }}>{tender.description ? (tender.description.substring(0, 130) + '...') : 'Execution per RFP specifications.'}</div>
                   </div>
                   <div style={{ background: 'var(--bg-card)', padding: '10px 12px', borderRadius: 8, border: '1px solid var(--border-subtle)' }}>
                     <div style={{ fontSize: '0.72rem', color: 'var(--text-muted)', fontWeight: 700, textTransform: 'uppercase' }}>Estimated Value</div>
