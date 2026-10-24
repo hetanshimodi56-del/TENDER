@@ -391,41 +391,6 @@ export default function AuthModal({
             </div>
           </div>
 
-          {/* Quick Demo Access Bar */}
-          <div style={{ marginTop: 20, paddingTop: 16, borderTop: '1px solid rgba(255, 255, 255, 0.08)' }}>
-            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 8 }}>
-              <span style={{ fontSize: '0.7rem', fontWeight: 700, color: '#64748b', textTransform: 'uppercase' }}>
-                Instant Evaluation (1-Click Demo)
-              </span>
-              <span style={{ fontSize: '0.68rem', color: '#38bdf8', fontWeight: 600 }}>
-                Pass: Password@123
-              </span>
-            </div>
-            <button
-              type="button"
-              onClick={() => handleDemoLogin(selectedRole)}
-              disabled={loading}
-              style={{
-                width: '100%',
-                padding: '10px 14px',
-                borderRadius: 8,
-                background: currentRoleInfo.bg,
-                border: `1px solid ${currentRoleInfo.color}`,
-                color: '#ffffff',
-                fontWeight: 700,
-                fontSize: '0.82rem',
-                cursor: 'pointer',
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                gap: 8,
-                transition: 'all 0.2s'
-              }}
-            >
-              <Sparkles size={14} color={currentRoleInfo.color} />
-              <span>Log in as <strong>{currentRoleInfo.shortTitle}</strong> ({currentRoleInfo.userId})</span>
-            </button>
-          </div>
         </div>
 
         {/* Right Side: Login & Registration Form */}
@@ -584,8 +549,9 @@ export default function AuthModal({
                     className="form-select"
                     style={{ background: '#090e17', color: '#fff', border: '1px solid #334155' }}
                   >
-                    <option value="company_user">3. Company / Bidder (Submit Bids)</option>
+                    <option value="super_admin">1. Super Admin (System Governance)</option>
                     <option value="tender_authority">2. Tender Authority / Department Head</option>
+                    <option value="company_user">3. Company / Bidder (Submit Bids)</option>
                     <option value="viewer">4. Viewer (Public Citizen)</option>
                   </select>
                 </div>
@@ -757,33 +723,7 @@ export default function AuthModal({
             </button>
           </form>
 
-          {onBrowseGuest && (
-            <button
-              type="button"
-              onClick={onBrowseGuest}
-              style={{
-                marginTop: 14,
-                width: '100%',
-                padding: '10px 14px',
-                borderRadius: 8,
-                background: 'rgba(255, 255, 255, 0.05)',
-                border: '1px solid rgba(255, 255, 255, 0.15)',
-                color: '#38bdf8',
-                fontWeight: 700,
-                fontSize: '0.82rem',
-                cursor: 'pointer',
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                gap: 8,
-                transition: 'all 0.15s ease'
-              }}
-              onMouseEnter={e => e.currentTarget.style.background = 'rgba(56, 189, 248, 0.1)'}
-              onMouseLeave={e => e.currentTarget.style.background = 'rgba(255, 255, 255, 0.05)'}
-            >
-              <Eye size={15} /> Browse Public Tenders as Guest (No Login Required) →
-            </button>
-          )}
+
 
           {/* Security & Architecture Notice */}
           <div style={{ marginTop: 18, textAlign: 'center', fontSize: '0.72rem', color: '#64748b' }}>
