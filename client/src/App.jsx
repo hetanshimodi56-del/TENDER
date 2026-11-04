@@ -285,7 +285,9 @@ export default function App() {
   }, []);
 
   const checkAuth = async () => {
-    const token = localStorage.getItem('etender_token');
+    localStorage.removeItem('etender_token');
+    localStorage.removeItem('etender_session_id');
+    const token = sessionStorage.getItem('etender_token');
     if (!token) {
       setLoading(false);
       setShowAuthModal(true);
@@ -305,6 +307,8 @@ export default function App() {
       loadSavedTenders();
     } catch (err) {
       console.error('Session expired:', err);
+      sessionStorage.removeItem('etender_token');
+      sessionStorage.removeItem('etender_session_id');
       localStorage.removeItem('etender_token');
       localStorage.removeItem('etender_session_id');
       setUser(null);
@@ -346,6 +350,8 @@ export default function App() {
     try {
       await api.logout().catch(() => {});
     } catch (_) {}
+    sessionStorage.removeItem('etender_token');
+    sessionStorage.removeItem('etender_session_id');
     localStorage.removeItem('etender_token');
     localStorage.removeItem('etender_session_id');
     setUser(null);

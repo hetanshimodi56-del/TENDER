@@ -1,8 +1,8 @@
 const API_BASE = import.meta.env.VITE_API_BASE || (import.meta.env.DEV ? '/api' : 'https://tender-pmts.onrender.com/api');
 
 function getAuthHeader() {
-  const token = localStorage.getItem('etender_token');
-  const sessionId = localStorage.getItem('etender_session_id');
+  const token = sessionStorage.getItem('etender_token');
+  const sessionId = sessionStorage.getItem('etender_session_id');
   const headers = {};
   if (token) headers['Authorization'] = `Bearer ${token}`;
   if (sessionId) headers['x-session-id'] = sessionId;

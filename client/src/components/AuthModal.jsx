@@ -147,8 +147,8 @@ export default function AuthModal({
     try {
       const target = roleDefinitions.find(r => r.role === targetRole);
       const res = await api.login(target ? target.demoIdentifier : targetRole, 'Password@123', true);
-      localStorage.setItem('etender_token', res.token);
-      if (res.sessionId) localStorage.setItem('etender_session_id', res.sessionId);
+      sessionStorage.setItem('etender_token', res.token); localStorage.removeItem('etender_token');
+      if (res.sessionId) sessionStorage.setItem('etender_session_id', res.sessionId); localStorage.removeItem('etender_session_id');
       onLoginSuccess(res.user);
     } catch (err) {
       setError(err.message || 'Demo login failed');
@@ -179,8 +179,8 @@ export default function AuthModal({
         res = await api.login(identifier, password, rememberMe);
       }
 
-      localStorage.setItem('etender_token', res.token);
-      if (res.sessionId) localStorage.setItem('etender_session_id', res.sessionId);
+      sessionStorage.setItem('etender_token', res.token); localStorage.removeItem('etender_token');
+      if (res.sessionId) sessionStorage.setItem('etender_session_id', res.sessionId); localStorage.removeItem('etender_session_id');
       onLoginSuccess(res.user);
     } catch (err) {
       setError(err.message || 'Authentication failed. Please verify credentials.');
