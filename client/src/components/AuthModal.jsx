@@ -233,27 +233,8 @@ export default function AuthModal({
   };
 
   return (
-    <div style={{
-      minHeight: '100vh',
-      display: 'flex',
-      alignItems: 'center',
-      justifyContent: 'center',
-      padding: '24px',
-      background: 'radial-gradient(ellipse at 50% 15%, rgba(14, 165, 233, 0.15), transparent 75%), #090e17',
-      position: 'relative'
-    }}>
-      <div style={{
-        width: '100%',
-        maxWidth: 1120,
-        display: 'grid',
-        gridTemplateColumns: '1.08fr 1fr',
-        borderRadius: 20,
-        overflow: 'hidden',
-        border: '1px solid rgba(255, 255, 255, 0.12)',
-        boxShadow: '0 25px 70px -15px rgba(0,0,0,0.85)',
-        background: '#0d1322',
-        position: 'relative'
-      }}>
+    <div className="auth-page-wrapper">
+      <div className="auth-modal-card">
         {onClose && (
           <button
             onClick={onClose}
@@ -280,14 +261,7 @@ export default function AuthModal({
           </button>
         )}
         {/* Left Side: Brand Showcase & Role Selection */}
-        <div style={{
-          padding: '40px 36px',
-          background: 'linear-gradient(145deg, rgba(15, 23, 42, 0.95), rgba(30, 41, 59, 0.7))',
-          borderRight: '1px solid rgba(255, 255, 255, 0.08)',
-          display: 'flex',
-          flexDirection: 'column',
-          justifyContent: 'space-between'
-        }}>
+        <div className="auth-modal-left">
           <div>
             {/* Platform Header */}
             <div style={{ display: 'inline-flex', alignItems: 'center', gap: 8, padding: '5px 14px', borderRadius: 20, background: 'rgba(56, 189, 248, 0.12)', border: '1px solid rgba(56, 189, 248, 0.3)', marginBottom: 14 }}>
@@ -394,7 +368,7 @@ export default function AuthModal({
         </div>
 
         {/* Right Side: Login & Registration Form */}
-        <div style={{ padding: '40px 36px', display: 'flex', flexDirection: 'column', justifyContent: 'center' }}>
+        <div className="auth-modal-right">
           {message && (
             <div style={{
               background: 'rgba(2, 132, 199, 0.15)',
