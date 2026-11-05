@@ -234,16 +234,20 @@ export default function App() {
 
   const handleNavigateToTenders = (filterType, filterVal) => {
     if (filterType === 'category') {
-      setTendersInitialFilter({ category: filterVal, state: 'All', statFilter: 'all', subTab: 'fresh' });
+      setTendersInitialFilter({ category: filterVal, state: 'All', statFilter: 'all', subTab: 'all' });
     } else if (filterType === 'state') {
-      setTendersInitialFilter({ category: 'All', state: filterVal, statFilter: 'all', subTab: 'fresh' });
+      setTendersInitialFilter({ category: 'All', state: filterVal, statFilter: 'all', subTab: 'all' });
     } else if (filterType === 'interested') {
-      setTendersInitialFilter({ category: 'All', state: 'All', statFilter: 'interested', subTab: 'fresh' });
+      setTendersInitialFilter({ category: 'All', state: 'All', statFilter: 'interested', subTab: 'saved' });
     } else if (filterType === 'my') {
       setCurrentTab('saved');
       return;
+    } else if (filterType === 'closing' || filterType === 'closing_soon') {
+      setTendersInitialFilter({ category: 'All', state: 'All', statFilter: 'all', subTab: 'closing_soon' });
+    } else if (filterType === 'high_match' || filterType === 'fresh') {
+      setTendersInitialFilter({ category: 'All', state: 'All', statFilter: 'all', subTab: 'high_match' });
     } else {
-      setTendersInitialFilter({ category: 'All', state: 'All', statFilter: 'all', subTab: 'fresh' });
+      setTendersInitialFilter({ category: 'All', state: 'All', statFilter: 'all', subTab: 'all' });
     }
     navigateToTab('tenders');
   };

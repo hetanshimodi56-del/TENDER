@@ -163,8 +163,9 @@ export default function TendersListView({
       if (initialFilter.category !== undefined) setSelectedCategory(initialFilter.category);
       if (initialFilter.state !== undefined) setSelectedState(initialFilter.state);
       if (initialFilter.subTab !== undefined) {
-        if (initialFilter.subTab === 'fresh') setActiveTab('high_match');
-        else if (initialFilter.subTab === 'interested') setActiveTab('saved');
+        if (initialFilter.subTab === 'fresh' || initialFilter.subTab === 'high_match') setActiveTab('high_match');
+        else if (initialFilter.subTab === 'interested' || initialFilter.subTab === 'saved') setActiveTab('saved');
+        else if (initialFilter.subTab === 'closing' || initialFilter.subTab === 'closing_soon') setActiveTab('closing_soon');
         else setActiveTab(initialFilter.subTab);
       }
     }
@@ -818,19 +819,36 @@ export default function TendersListView({
                 <div>
                   {/* Top Metadata Line */}
                   <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 6, flexWrap: 'wrap' }}>
-                    <span style={{
-                      fontSize: '0.72rem',
-                      fontFamily: 'monospace',
-                      fontWeight: 700,
-                      color: '#4f46e5',
-                      background: '#eef2ff',
-                      padding: '2px 8px',
-                      borderRadius: 4,
-                      border: '1px solid #c7d2fe',
-                      display: 'inline-flex',
-                      alignItems: 'center',
-                      gap: 6
-                    }}>
+                    <span 
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        if (onViewDetails) onViewDetails(tender);
+                      }}
+                      title="Click to view tender details"
+                      style={{
+                        fontSize: '0.72rem',
+                        fontFamily: 'monospace',
+                        fontWeight: 700,
+                        color: '#4f46e5',
+                        background: '#eef2ff',
+                        padding: '2px 8px',
+                        borderRadius: 4,
+                        border: '1px solid #c7d2fe',
+                        display: 'inline-flex',
+                        alignItems: 'center',
+                        gap: 6,
+                        cursor: 'pointer',
+                        transition: 'all 0.15s ease'
+                      }}
+                      onMouseEnter={e => {
+                        e.currentTarget.style.background = '#e0e7ff';
+                        e.currentTarget.style.borderColor = '#818cf8';
+                      }}
+                      onMouseLeave={e => {
+                        e.currentTarget.style.background = '#eef2ff';
+                        e.currentTarget.style.borderColor = '#c7d2fe';
+                      }}
+                    >
                       <span className="radar-live-dot" title="Live active tender" />
                       {tender.tender_reference_no}
                     </span>

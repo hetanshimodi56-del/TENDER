@@ -97,10 +97,10 @@ export default function TenderSidebar({
       { id: 'tenders', label: 'Tenders', icon: FileText },
       { id: 'smart_matching', label: 'Smart AI Matching', icon: Target },
       { id: 'client_profile', label: 'Client Profile & Dashboard', icon: UserCheck },
-      { id: 'tender_tasks', label: 'Tender Tasks', icon: CheckSquare, hasChevron: true, action: () => setCurrentTab('tasks') },
+      { id: 'tasks', label: 'Tender Tasks', icon: CheckSquare, action: () => setCurrentTab('tasks') },
       { id: 'mis_reports', label: 'MIS & Reports', icon: FileSpreadsheet, action: onOpenMIS },
       { id: 'manage_files', label: 'Manage Files', icon: FolderKanban, hasChevron: true, action: onOpenFiles },
-      { id: 'tasks', label: 'Tasks', icon: ListTodo, action: () => setCurrentTab('tasks') },
+
       { id: 'roles_rights', label: 'Roles & Rights', icon: Users, hasChevron: true, action: onOpenRoles },
       { id: 'configuration', label: 'Configuration', icon: Settings, hasChevron: true, action: () => setCurrentTab('profile') },
       { id: 'finance_manage', label: 'Finance Manage', icon: IndianRupee, hasChevron: true, action: onOpenFinance }
