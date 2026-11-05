@@ -303,7 +303,7 @@ export default function App() {
       setUser(res.user);
       setShowAuthModal(false);
       const urlTab = getTabFromUrl();
-      if (urlTab) {
+      if (urlTab && !(res.user.role === 'super_admin' && (urlTab === 'dashboard' || urlTab === 'sales' || urlTab === 'finance'))) {
         setCurrentTab(urlTab);
       } else {
         setCurrentTab(getAuthorizedHomeTab(res.user.role));

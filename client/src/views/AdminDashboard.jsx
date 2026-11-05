@@ -44,7 +44,29 @@ import { useLanguage } from '../utils/LanguageContext';
 
 export default function AdminDashboard({ user, initialTab = 'overview', onViewDetails, onOpenAddTender, onShowToast }) {
   const { language, setLanguage, t } = useLanguage();
-  const [activeTab, setActiveTab] = useState(initialTab);
+
+  const normalizeTab = (t) => {
+    if (!t || t === 'admin' || t === 'overview') return 'overview';
+    if (t === 'admin_clients') return 'clients';
+    if (t === 'admin_users') return 'users';
+    if (t === 'admin_companies') return 'companies';
+    if (t === 'admin_authorities') return 'authorities';
+    if (t === 'admin_tenders') return 'tenders';
+    if (t === 'admin_bids') return 'bids';
+    if (t === 'admin_documents') return 'documents';
+    if (t === 'admin_audits') return 'audits';
+    if (t === 'admin_settings') return 'settings';
+    if (t.startsWith('admin_')) return t.replace('admin_', '');
+    return t;
+  };
+
+  const [activeTab, setActiveTab] = useState(() => normalizeTab(initialTab));
+
+  useEffect(() => {
+    if (initialTab) {
+      setActiveTab(normalizeTab(initialTab));
+    }
+  }, [initialTab]);
   const [kpiData, setKpiData] = useState(null);
   const [usersList, setUsersList] = useState([]);
   const [companiesList, setCompaniesList] = useState([]);
@@ -496,7 +518,7 @@ export default function AdminDashboard({ user, initialTab = 'overview', onViewDe
 
 
       {/* TAB 1: OVERVIEW & EXECUTIVE KPIS */}
-      {activeTab === 'overview' && (
+      {(activeTab === 'overview' || activeTab === 'admin') && (
         <div style={{ display: 'flex', flexDirection: 'column', gap: 20 }}>
           {/* Top 6 Core KPIs mandated by Prompt */}
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(6, 1fr)', gap: 14 }}>

@@ -228,8 +228,8 @@ export default function TenderSidebar({
         }}
       >
         
-        {/* Expandable Dashboard Item (as shown in images for Company/Vendor and Super Admin) */}
-        {(role === 'company_user' || role === 'super_admin' || !role) && (
+        {/* Expandable Dashboard Item (for Company/Vendor only) */}
+        {(role === 'company_user' || (!role && role !== 'super_admin')) && (
           <div style={{ marginBottom: 4 }}>
             {/* Dashboard Parent Trigger */}
             <div
