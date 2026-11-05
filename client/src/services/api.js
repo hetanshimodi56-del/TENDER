@@ -35,9 +35,9 @@ async function request(endpoint, options = {}) {
 
 export const api = {
   // Auth (Session-based + Token-based + User ID identification)
-  login: (email, password, rememberMe = false) => request('/auth/login', {
+  login: (email, password, rememberMe = false, role = null) => request('/auth/login', {
     method: 'POST',
-    body: JSON.stringify({ email, password, remember_me: rememberMe, rememberMe })
+    body: JSON.stringify({ email, password, remember_me: rememberMe, rememberMe, role })
   }),
   register: (userData) => request('/auth/register', { method: 'POST', body: JSON.stringify(userData) }),
   logout: () => request('/auth/logout', { method: 'POST' }),

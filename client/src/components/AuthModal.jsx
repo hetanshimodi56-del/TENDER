@@ -160,13 +160,13 @@ export default function AuthModal({
           name,
           email: identifier,
           password,
-          role: selectedRole === 'super_admin' ? 'company_user' : selectedRole,
+          role: 'company_user',
           organization_name: orgName,
           registration_number: regNumber,
           gst_number: gstNumber
         });
       } else {
-        res = await api.login(identifier, password, rememberMe);
+        res = await api.login(identifier, password, rememberMe, selectedRole);
       }
 
       sessionStorage.setItem('etender_token', res.token); localStorage.removeItem('etender_token');
@@ -407,7 +407,7 @@ export default function AuthModal({
             </button>
             <button
               type="button"
-              onClick={() => { setIsRegister(true); setError(''); }}
+              onClick={() => { setIsRegister(true); setSelectedRole('company_user'); setError(''); }}
               style={{
                 flex: 1,
                 padding: '8px 0',

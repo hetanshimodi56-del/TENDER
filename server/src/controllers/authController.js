@@ -222,6 +222,40 @@ exports.login = (req, res) => {
       return res.status(401).json({ success: false, message: 'Invalid credentials. Password incorrect.' });
     }
 
+    // Strict Role Matching (Prevents Company login under Super Admin, and vice-versa)
+    const requestedRole = req.body.role;
+    if (requestedRole) {
+      const normalize = r => {
+        if (!r) return '';
+        if (['super_admin', 'admin'].includes(r)) return 'super_admin';
+        if (['tender_authority', 'authority'].includes(r)) return 'tender_authority';
+        if (['company_user', 'vendor', 'company', 'bidder'].includes(r)) return 'company_user';
+        if (['viewer', 'guest'].includes(r)) return 'viewer';
+        if (['evaluator'].includes(r)) return 'evaluator';
+        return r;
+      };
+
+      const roleLabels = {
+        super_admin: 'Super Admin',
+        tender_authority: 'Tender Authority',
+        company_user: 'Company / Bidder',
+        viewer: 'Public Viewer',
+        evaluator: 'Technical Evaluator'
+      };
+
+      const userRoleNorm = normalize(user.role);
+      const reqRoleNorm = normalize(requestedRole);
+
+      if (userRoleNorm !== reqRoleNorm) {
+        const actualName = roleLabels[userRoleNorm] || user.role;
+        const targetName = roleLabels[reqRoleNorm] || requestedRole;
+        return res.status(403).json({
+          success: false,
+          message: `Role Mismatch: This account belongs to '${actualName}'. Please select '${actualName}' on the left to sign in.`
+        });
+      }
+    }
+
     // Create authenticated server session & cookie
     const isRemembered = Boolean(remember_me || rememberMe);
     const sessionId = createServerSession(user, req, res, isRemembered);
