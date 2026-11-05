@@ -169,7 +169,7 @@ export default function Navbar({
               className="btn btn-sm btn-secondary glow-border"
               onClick={() => setShowRoleDropdown(!showRoleDropdown)}
               style={{ padding: '6px 12px', fontSize: '0.8rem' }}
-              title="Switch demo persona for viva demonstration"
+              title="Switch active role workspace"
             >
               <span style={{ fontSize: '1rem' }}>
                 {roles.find(r => r.role === user?.role)?.icon || '👤'}
@@ -194,7 +194,7 @@ export default function Navbar({
                 zIndex: 200
               }}>
                 <div style={{ padding: '6px 10px', fontSize: '0.72rem', color: 'var(--text-muted)', borderBottom: '1px solid var(--border-subtle)', marginBottom: 6 }}>
-                  ⚡ QUICK DEMO SWITCHER (FOR VIVA)
+                  ⚡ SWITCH ROLE WORKSPACE
                 </div>
                 {roles.map(r => (
                   <div

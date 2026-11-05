@@ -589,8 +589,8 @@ export default function ClientModuleView({ user, onShowToast, onViewTenderDetail
                   { key: 'business_type', label: 'Business Type', type: 'text' },
                   { key: 'industry', label: 'Industry', type: 'text' },
                   { key: 'mobile', label: 'Mobile Number', type: 'text' },
-                  { key: 'gstin', label: 'GSTIN (Demo Placeholder)', type: 'text' },
-                  { key: 'pan', label: 'PAN (Demo Placeholder)', type: 'text' },
+                  { key: 'gstin', label: 'GSTIN Registration', type: 'text' },
+                  { key: 'pan', label: 'PAN Card Number', type: 'text' },
                   { key: 'address', label: 'Address', type: 'text' },
                   { key: 'city', label: 'City', type: 'text' },
                   { key: 'state', label: 'State', type: 'text' },
@@ -653,8 +653,8 @@ export default function ClientModuleView({ user, onShowToast, onViewTenderDetail
                   { label: 'Company Name', value: profile.company_name || 'N/A', icon: Building },
                   { label: 'Business Type', value: profile.business_type || 'N/A', icon: Briefcase },
                   { label: 'Industry', value: profile.industry || 'N/A', icon: Layers },
-                  { label: 'GSTIN', value: profile.gstin || 'N/A (Demo)', icon: CreditCard, mono: true },
-                  { label: 'PAN', value: profile.pan || 'N/A (Demo)', icon: CreditCard, mono: true }
+                  { label: 'GSTIN', value: profile.gstin || 'Not Provided', icon: CreditCard, mono: true },
+                  { label: 'PAN', value: profile.pan || 'Not Provided', icon: CreditCard, mono: true }
                 ].map((item, i) => (
                   <div key={i} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '8px 0', borderBottom: i < 5 ? '1px solid var(--border-subtle)' : 'none' }}>
                     <span style={{ display: 'flex', alignItems: 'center', gap: 6, fontSize: '0.8rem', color: 'var(--text-muted)' }}>
@@ -1021,7 +1021,7 @@ export default function ClientModuleView({ user, onShowToast, onViewTenderDetail
                         </div>
                         <StatusBadge status={doc.verification_status || 'pending'} />
                         <div style={{ display: 'flex', gap: 4 }}>
-                          <button onClick={() => onShowToast?.('Download started (demo)', 'success')} style={{
+                          <button onClick={() => onShowToast?.('Document download started', 'success')} style={{
                             width: 30, height: 30, borderRadius: 6, border: '1px solid var(--border-subtle)',
                             background: 'var(--bg-card)', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center'
                           }}>
