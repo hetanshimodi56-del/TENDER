@@ -87,10 +87,8 @@ export default function TenderSidebar({
 
     if (role === 'viewer' || role === 'guest') {
       return [
-        { id: 'tenders', label: t('browse_tenders') || 'Browse Tenders', icon: FileText },
-        { id: 'viewer', label: t('dashboard') || 'Public Portal', icon: LayoutDashboard },
-        { id: 'viewer_categories', label: t('categories') || 'Categories', icon: Tag },
-        { id: 'viewer_search', label: t('search') || 'Search Tenders', icon: Search }
+        { id: 'tenders', label: 'Browse Tenders', icon: FileText },
+        { id: 'viewer', label: 'Public Portal & FAQs', icon: LayoutDashboard }
       ];
     }
 

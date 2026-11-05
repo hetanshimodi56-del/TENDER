@@ -132,7 +132,7 @@ export default function TenderDetailsModal({
         {/* Top Header */}
         <div style={{
           padding: '24px 28px',
-          background: 'linear-gradient(180deg, rgba(30, 58, 138, 0.25), rgba(15, 23, 42, 0.9))',
+          background: '#f8fafc',
           borderBottom: '1px solid var(--border-subtle)',
           position: 'relative'
         }}>
@@ -402,11 +402,11 @@ export default function TenderDetailsModal({
               <div>
                 <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 10 }}>
                   <Sparkles size={16} color="#c084fc" />
-                  <h4 style={{ fontSize: '0.92rem', color: '#fff' }}>Extracted Key Clauses & Penalties</h4>
+                  <h4 style={{ fontSize: '0.92rem', color: '#0f172a', fontWeight: 700 }}>Extracted Key Clauses & Penalties</h4>
                 </div>
                 <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
                   {(tender.clauses_summary || []).map((clause, i) => (
-                    <div key={i} style={{ fontSize: '0.85rem', color: '#e2e8f0', background: 'rgba(139, 92, 246, 0.06)', padding: '10px 14px', borderRadius: 8, borderLeft: '3px solid #8b5cf6' }}>
+                    <div key={i} style={{ fontSize: '0.85rem', color: '#1e293b', background: '#f8fafc', border: '1px solid #e2e8f0', padding: '10px 14px', borderRadius: 8, borderLeft: '3px solid #8b5cf6' }}>
                       📌 {clause}
                     </div>
                   ))}
@@ -416,13 +416,13 @@ export default function TenderDetailsModal({
               <div>
                 <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 10 }}>
                   <CheckCircle size={16} color="#34d399" />
-                  <h4 style={{ fontSize: '0.92rem', color: '#fff' }}>Bidder Preparation Checklist</h4>
+                  <h4 style={{ fontSize: '0.92rem', color: '#0f172a', fontWeight: 700 }}>Bidder Preparation Checklist</h4>
                 </div>
                 <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
                   {(tender.bidder_checklist || []).map((chk, i) => (
                     <div key={i} style={{ display: 'flex', alignItems: 'center', gap: 10, background: 'rgba(16, 185, 129, 0.05)', padding: '10px 14px', borderRadius: 8, border: '1px solid rgba(16, 185, 129, 0.2)', fontSize: '0.85rem' }}>
                       <input type="checkbox" defaultChecked={false} style={{ cursor: 'pointer', accentColor: '#10b981' }} />
-                      <span style={{ color: '#fff' }}>{chk.item}</span>
+                      <span style={{ color: '#0f172a', fontWeight: 500 }}>{chk.item}</span>
                     </div>
                   ))}
                 </div>
@@ -447,7 +447,7 @@ export default function TenderDetailsModal({
                     key={sim.id}
                     onClick={() => onSelectSimilar(sim.id)}
                     style={{
-                      background: 'rgba(15, 23, 42, 0.5)',
+                      background: '#f8fafc',
                       padding: '12px 14px',
                       borderRadius: 10,
                       border: '1px solid var(--border-subtle)',
@@ -458,7 +458,7 @@ export default function TenderDetailsModal({
                     onMouseLeave={e => e.currentTarget.style.borderColor = 'var(--border-subtle)'}
                   >
                     <div style={{ fontSize: '0.7rem', color: '#60a5fa', fontFamily: 'monospace' }}>{sim.tender_reference_no}</div>
-                    <div style={{ fontSize: '0.82rem', fontWeight: 600, color: '#fff', margin: '4px 0', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                    <div style={{ fontSize: '0.82rem', fontWeight: 600, color: '#0f172a', margin: '4px 0', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
                       {sim.title}
                     </div>
                     <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.75rem' }}>

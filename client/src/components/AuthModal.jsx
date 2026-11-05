@@ -31,13 +31,8 @@ export default function AuthModal({
 }) {
   const [isRegister, setIsRegister] = useState(false);
   const [selectedRole, setSelectedRole] = useState(initialRole); // super_admin, tender_authority, company_user, viewer
-  const [identifier, setIdentifier] = useState(() => {
-    if (initialRole === 'viewer') return 'VIEW001';
-    if (initialRole === 'super_admin') return 'ADM001';
-    if (initialRole === 'tender_authority') return 'AUTH001';
-    return 'BID001';
-  });
-  const [password, setPassword] = useState('Password@123');
+  const [identifier, setIdentifier] = useState('');
+  const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
   const [rememberMe, setRememberMe] = useState(true);
   
@@ -134,11 +129,6 @@ export default function AuthModal({
   const handleRoleSelect = (roleKey) => {
     setSelectedRole(roleKey);
     setError('');
-    const target = roleDefinitions.find(r => r.role === roleKey);
-    if (target && !isRegister) {
-      setIdentifier(target.demoIdentifier);
-      setPassword('Password@123');
-    }
   };
 
   const handleDemoLogin = async (targetRole) => {

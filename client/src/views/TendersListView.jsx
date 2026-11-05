@@ -202,7 +202,7 @@ export default function TendersListView({
     const url = URL.createObjectURL(blob);
     const link = document.createElement('a');
     link.href = url;
-    link.download = `BidSphere_Tenders_Export_${Date.now()}.csv`;
+    link.download = `TenderHub_Tenders_Export_${Date.now()}.csv`;
     link.click();
     if (onShowToast) onShowToast('Exported active tenders list to CSV spreadsheet.');
   };
@@ -232,8 +232,31 @@ export default function TendersListView({
     }
   };
 
+  // Dynamic Real Counts for KPIs
+  const totalBidsCount = tenders.length;
+  const totalProcurementValue = tenders.reduce((acc, t) => acc + (Number(t.estimated_value) || 0), 0);
+  const highMatchCount = tenders.filter(t => (t.ai_match_score || 85) >= 70).length;
+  const urgentCount = tenders.filter(t => {
+    const days = Math.ceil((new Date(t.closing_date).getTime() - Date.now()) / 86400000);
+    return days >= 0 && days <= 7;
+  }).length;
+  const shortlistedCount = savedTenderIds.size;
+
   // Pipeline Filtering
   let displayTenders = tenders.filter(t => !notInterestedIds.has(t.id));
+
+  // Instant reactive client search filter
+  if (searchQuery && searchQuery.trim()) {
+    const q = searchQuery.toLowerCase().trim();
+    displayTenders = displayTenders.filter(t =>
+      (t.title && t.title.toLowerCase().includes(q)) ||
+      (t.tender_reference_no && t.tender_reference_no.toLowerCase().includes(q)) ||
+      (t.organization_name && t.organization_name.toLowerCase().includes(q)) ||
+      (t.category && t.category.toLowerCase().includes(q)) ||
+      (t.location_state && t.location_state.toLowerCase().includes(q)) ||
+      (t.location_city && t.location_city.toLowerCase().includes(q))
+    );
+  }
 
   if (activeTab === 'high_match') {
     displayTenders = displayTenders.filter(t => (t.ai_match_score || 85) >= 70);
@@ -301,10 +324,10 @@ export default function TendersListView({
         >
           <div style={{ fontSize: '0.74rem', color: '#64748b', fontWeight: 600 }}>Active Market Bids</div>
           <div style={{ fontSize: '1.4rem', fontWeight: 800, color: '#0f172a', marginTop: 2 }}>
-            <CountUpNumber end={874} /> <span style={{ fontSize: '0.72rem', fontWeight: 500, color: '#64748b' }}>Tenders</span>
+            <CountUpNumber end={totalBidsCount} /> <span style={{ fontSize: '0.72rem', fontWeight: 500, color: '#64748b' }}>Tenders</span>
           </div>
           <div style={{ fontSize: '0.72rem', color: '#4f46e5', fontWeight: 600, marginTop: 4 }}>
-            ₹2,450 Cr Total Value →
+            {formatINR(totalProcurementValue)} Total Value
           </div>
         </div>
 
@@ -313,7 +336,7 @@ export default function TendersListView({
           className="saas-card card-interactive"
           onClick={() => {
             setActiveTab(activeTab === 'high_match' ? 'all' : 'high_match');
-            if (onShowToast) onShowToast('Filtered to 60 High AI Match Tenders');
+            if (onShowToast) onShowToast('Filtered to High AI Match Tenders');
           }}
           style={{
             padding: '16px',
@@ -324,7 +347,7 @@ export default function TendersListView({
         >
           <div style={{ fontSize: '0.74rem', color: '#64748b', fontWeight: 600 }}>High AI Fit (80%+)</div>
           <div style={{ fontSize: '1.4rem', fontWeight: 800, color: '#059669', marginTop: 2 }}>
-            <CountUpNumber end={60} /> <span style={{ fontSize: '0.72rem', fontWeight: 500, color: '#64748b' }}>Matches</span>
+            <CountUpNumber end={highMatchCount} /> <span style={{ fontSize: '0.72rem', fontWeight: 500, color: '#64748b' }}>Matches</span>
           </div>
           <div style={{ fontSize: '0.72rem', color: '#059669', fontWeight: 600, marginTop: 4 }}>
             Highest Win Probability →
@@ -347,7 +370,7 @@ export default function TendersListView({
         >
           <div style={{ fontSize: '0.74rem', color: '#64748b', fontWeight: 600 }}>Urgent Submissions</div>
           <div style={{ fontSize: '1.4rem', fontWeight: 800, color: '#c2410c', marginTop: 2 }}>
-            <CountUpNumber end={2} /> <span style={{ fontSize: '0.72rem', fontWeight: 500, color: '#64748b' }}>Closing &lt; 48h</span>
+            <CountUpNumber end={urgentCount} /> <span style={{ fontSize: '0.72rem', fontWeight: 500, color: '#64748b' }}>Closing in &le; 7 Days</span>
           </div>
           <div style={{ fontSize: '0.72rem', color: '#ea580c', fontWeight: 600, marginTop: 4 }}>
             Action Required Now →
@@ -370,7 +393,7 @@ export default function TendersListView({
         >
           <div style={{ fontSize: '0.74rem', color: '#64748b', fontWeight: 600 }}>Interested Shortlist</div>
           <div style={{ fontSize: '1.4rem', fontWeight: 800, color: '#db2777', marginTop: 2 }}>
-            <CountUpNumber end={savedTenderIds.size + 3} /> <span style={{ fontSize: '0.72rem', fontWeight: 500, color: '#64748b' }}>Bids</span>
+            <CountUpNumber end={shortlistedCount} /> <span style={{ fontSize: '0.72rem', fontWeight: 500, color: '#64748b' }}>Bids</span>
           </div>
           <div style={{ fontSize: '0.72rem', color: '#db2777', fontWeight: 600, marginTop: 4 }}>
             Proposal In Preparation →
@@ -668,7 +691,7 @@ export default function TendersListView({
               type="text"
               value={searchQuery}
               onChange={e => setSearchQuery(e.target.value)}
-              placeholder="Search title, organization..."
+              onKeyDown={e => { if (e.key === "Enter") fetchTenders(); }} placeholder="Search title, organization..."
               className="form-input"
             />
           </div>

@@ -53,7 +53,7 @@ ${(tender.clauses_summary || ['Standard Liquidated damages of 0.5% per week of d
 
 ================================================================================
 Authorized Signatory: Chief Procurement Officer
-Document Generated via BidSphere AI Enterprise Procurement Platform
+Document Generated via TenderHub AI Enterprise Procurement Platform
 Timestamp: ${new Date().toISOString()}
 ================================================================================`;
 

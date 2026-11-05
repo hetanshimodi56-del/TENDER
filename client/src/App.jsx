@@ -467,7 +467,7 @@ export default function App() {
   if (loading) {
     return (
       <div style={{ minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center', background: '#f8fafc', color: '#4f46e5', fontWeight: 600 }}>
-        Loading BidSphere AI Platform...
+        Loading TenderHub AI Platform...
       </div>
     );
   }
@@ -490,7 +490,7 @@ export default function App() {
 
   return (
     <div style={{ display: 'flex', height: '100vh', width: '100vw', overflow: 'hidden', background: 'var(--bg-gradient)' }}>
-      {/* BidSphere AI Left Sidebar (Fixed 100vh, Independent Scroll) */}
+      {/* TenderHub AI Left Sidebar (Fixed 100vh, Independent Scroll) */}
       <TenderSidebar
         currentTab={currentTab}
         setCurrentTab={navigateToTab}
@@ -506,7 +506,7 @@ export default function App() {
 
       {/* Main Content Area (Fixed 100vh, Column) */}
       <div style={{ flex: 1, display: 'flex', flexDirection: 'column', height: '100vh', minWidth: 0, overflow: 'hidden' }}>
-        {/* BidSphere AI Top Header (Pinned 60px) */}
+        {/* TenderHub AI Top Header (Pinned 60px) */}
         <TenderHeader
           user={user}
           onLogout={handleLogout}

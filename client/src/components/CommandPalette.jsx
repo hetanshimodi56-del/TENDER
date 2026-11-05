@@ -335,7 +335,7 @@ export default function CommandPalette({
             <span>Esc Close</span>
           </div>
           <span style={{ display: 'flex', alignItems: 'center', gap: 4, color: '#00796b', fontWeight: 600 }}>
-            <Sparkles size={12} /> BidSphere Spotlight
+            <Sparkles size={12} /> TenderHub Spotlight
           </span>
         </div>
       </div>

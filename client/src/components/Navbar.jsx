@@ -77,7 +77,7 @@ export default function Navbar({
           <div>
             <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
               <span style={{ fontSize: '1.25rem', fontWeight: 800, letterSpacing: '-0.02em', color: '#fff' }}>
-                BidSphere <span style={{ color: '#3b82f6' }}>AI</span>
+                TenderHub <span style={{ color: '#3b82f6' }}>AI</span>
               </span>
               <span className="badge badge-blue" style={{ fontSize: '0.65rem' }}>Enterprise</span>
             </div>

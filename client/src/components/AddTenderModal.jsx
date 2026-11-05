@@ -164,7 +164,7 @@ export default function AddTenderModal({ onClose, onTenderCreated, user, onShowT
                 Add New Tender Opportunity
               </h2>
               <p style={{ fontSize: '0.78rem', color: '#94a3b8', margin: 0 }}>
-                Publish a new official procurement tender or upload RFP details into BidSphere
+                Publish a new official procurement tender or upload RFP details into TenderHub
               </p>
             </div>
           </div>

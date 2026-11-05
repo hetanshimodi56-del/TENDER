@@ -40,12 +40,11 @@ export default function ViewerDashboard({ onViewDetails, onShowToast, onOpenAskA
   const categories = [
     'All',
     'Information Technology',
-    'Smart Infrastructure',
-    'Healthcare & Medical',
-    'Civil Works & Highways',
+    'Civil Works & Construction',
+    'Healthcare & Medical Equipment',
+    'Healthcare & Maintenance',
     'Renewable Energy',
-    'Education & Training',
-    'Cybersecurity & Defence'
+    'Electronics & Hardware'
   ];
 
   const states = ['All', 'Gujarat', 'Delhi', 'Maharashtra', 'Karnataka', 'Pan-India'];
